@@ -1,0 +1,817 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--Created by yFiles for HTML 3.0.0.3-->
+<graphml xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://www.yworks.com/xml/schema/graphml.html/2.0/ygraphml.xsd " xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:yca="http://www.yworks.com/xml/yfiles-compat-arrows/1.0" xmlns:ycns="http://www.yworks.com/xml/yfiles-compat-node-styles/1.0" xmlns:yjs2="http://www.yworks.com/xml/yfiles-for-html/2.0/xaml" xmlns:template-styles="http://www.yworks.com/demos/template-node-style/3.0" xmlns:demostyle2="http://www.yworks.com/yFilesHTML/demos/FlatDemoStyle/2.0" xmlns:demostyle="http://www.yworks.com/yFilesHTML/demos/FlatDemoStyle/1.0" xmlns:icon-style="http://www.yworks.com/yed-live/icon-style/1.0" xmlns:bpmn="http://www.yworks.com/xml/yfiles-bpmn/2.0" xmlns:demotablestyle="http://www.yworks.com/yFilesHTML/demos/FlatDemoTableStyle/1.0" xmlns:uml="http://www.yworks.com/yFilesHTML/demos/UMLDemoStyle/1.0" xmlns:GraphvizNodeStyle="http://www.yworks.com/yFilesHTML/graphviz-node-style/1.0" xmlns:Vue3jsNodeStyle="http://www.yworks.com/demos/yfiles-vue-node-style/3.0" xmlns:explorer-style="http://www.yworks.com/data-explorer/1.0" xmlns:yx="http://www.yworks.com/xml/yfiles-common/4.0" xmlns:y="http://www.yworks.com/xml/yfiles-common/3.0" xmlns:x="http://www.yworks.com/xml/yfiles-common/markup/3.0" xmlns:yjs="http://www.yworks.com/xml/yfiles-for-html/3.0/xaml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<key id="d0" for="node" attr.type="int" attr.name="zOrder" y:attr.uri="http://www.yworks.com/xml/yfiles-z-order/1.0/zOrder"/>
+	<key id="d1" for="node" attr.type="boolean" attr.name="Expanded" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/Expanded">
+		<default>true</default>
+	</key>
+	<key id="d2" for="node" attr.type="string" attr.name="url"/>
+	<key id="d3" for="node" attr.type="string" attr.name="description"/>
+	<key id="d4" for="node" attr.name="NodeLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeLabels"/>
+	<key id="d5" for="node" attr.name="NodeGeometry" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeGeometry"/>
+	<key id="d6" for="all" attr.name="UserTags" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/UserTags"/>
+	<key id="d7" for="node" attr.name="NodeStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/NodeStyle"/>
+	<key id="d8" for="node" attr.name="NodeViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/NodeViewState"/>
+	<key id="d9" for="edge" attr.type="string" attr.name="url"/>
+	<key id="d10" for="edge" attr.type="string" attr.name="description"/>
+	<key id="d11" for="edge" attr.name="EdgeLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeLabels"/>
+	<key id="d12" for="edge" attr.name="EdgeGeometry" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeGeometry"/>
+	<key id="d13" for="edge" attr.name="EdgeStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/EdgeStyle"/>
+	<key id="d14" for="edge" attr.name="EdgeViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/EdgeViewState"/>
+	<key id="d15" for="port" attr.name="PortLabels" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortLabels"/>
+	<key id="d16" for="port" attr.name="PortLocationParameter" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortLocationParameter">
+		<default>
+			<x:Static Member="y:FreeNodePortLocationModel.NodeCenterAnchored"/>
+		</default>
+	</key>
+	<key id="d17" for="port" attr.name="PortStyle" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/PortStyle">
+		<default>
+			<x:Static Member="y:VoidPortStyle.Instance"/>
+		</default>
+	</key>
+	<key id="d18" for="port" attr.name="PortViewState" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/folding/1.1/PortViewState"/>
+	<key id="d19" attr.name="SharedData" y:attr.uri="http://www.yworks.com/xml/yfiles-common/2.0/SharedData"/>
+	<data key="d19">
+		<y:SharedData>
+			<yx:ExteriorNodeLabelModel x:Key="1" Margins="5"/>
+			<yx:CompositeLabelModel x:Key="2">
+				<yx:CompositeLabelModel.Models>
+					<yx:CompositeLabelModelModelPair Model="{y:GraphMLReference 1}"/>
+					<yx:CompositeLabelModelModelPair>
+						<yx:CompositeLabelModelModelPair.Model>
+							<yx:InteriorNodeLabelModel/>
+						</yx:CompositeLabelModelModelPair.Model>
+					</yx:CompositeLabelModelModelPair>
+					<yx:CompositeLabelModelModelPair Model="{x:Static yx:FreeNodeLabelModel.Instance}"/>
+				</yx:CompositeLabelModel.Models>
+			</yx:CompositeLabelModel>
+			<yjs:Font x:Key="3" fontSize="12" fontFamily="Roboto"/>
+			<yjs:Color x:Key="4" value="#FFE0E0E0"/>
+			<yjs:LabelStyle x:Key="5" verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" font="{y:GraphMLReference 8}"/>
+			<bpmn:AlternatingLeafStripeStyle x:Key="6">
+				<bpmn:AlternatingLeafStripeStyle.evenLeafDescriptor>
+					<bpmn:StripeDescriptor backgroundFill="#FFC4D7ED" insetFill="{y:GraphMLReference 4}"/>
+				</bpmn:AlternatingLeafStripeStyle.evenLeafDescriptor>
+				<bpmn:AlternatingLeafStripeStyle.parentDescriptor>
+					<bpmn:StripeDescriptor backgroundFill="#FF7192B2" insetFill="{y:GraphMLReference 4}"/>
+				</bpmn:AlternatingLeafStripeStyle.parentDescriptor>
+				<bpmn:AlternatingLeafStripeStyle.oddLeafDescriptor>
+					<bpmn:StripeDescriptor backgroundFill="#FFABC8E2" insetFill="{y:GraphMLReference 4}"/>
+				</bpmn:AlternatingLeafStripeStyle.oddLeafDescriptor>
+			</bpmn:AlternatingLeafStripeStyle>
+			<yjs:NodeStyleStripeStyleAdapter x:Key="7">
+				<yjs:ShapeNodeStyle stroke="{x:Null}" fill="TRANSPARENT"/>
+			</yjs:NodeStyleStripeStyleAdapter>
+			<yjs:Font x:Key="8" fontSize="12" lineSpacing="0.2"/>
+			<yx:CompositeLabelModelParameter x:Key="9" Model="{y:GraphMLReference 2}">
+				<yx:CompositeLabelModelParameter.Parameter>
+					<yx:ExteriorNodeLabelModelParameter Position="Left" Model="{y:GraphMLReference 1}"/>
+				</yx:CompositeLabelModelParameter.Parameter>
+			</yx:CompositeLabelModelParameter>
+			<yx:ExteriorNodeLabelModel x:Key="10" Margins="5"/>
+			<y:FreeNodePortLocationModelParameter x:Key="11" Ratio="0.009803921568627472,0.5"/>
+			<yx:CompositeLabelModelParameter x:Key="12" Model="{y:GraphMLReference 2}">
+				<yx:CompositeLabelModelParameter.Parameter>
+					<yx:ExteriorNodeLabelModelParameter Position="Bottom" Model="{y:GraphMLReference 1}"/>
+				</yx:CompositeLabelModelParameter.Parameter>
+			</yx:CompositeLabelModelParameter>
+			<bpmn:BpmnEdgeStyle x:Key="13"/>
+			<yx:SmartEdgeLabelModelParameter x:Key="14" Distance="5">
+				<yx:SmartEdgeLabelModelParameter.Model>
+					<yx:SmartEdgeLabelModel/>
+				</yx:SmartEdgeLabelModelParameter.Model>
+			</yx:SmartEdgeLabelModelParameter>
+			<bpmn:BpmnEdgeStyle x:Key="15"/>
+		</y:SharedData>
+	</data>
+	<graph id="G" edgedefault="directed">
+		<data key="d6">
+			<y:Json>{"version":"2.0.0","origin":"yed-live","theme":{"name":"light","version":"1.0.0"},"layout":"layout-bpmn","config":{"noObf_layoutOrientation":"LEFT_TO_RIGHT","noObf_scope":"ALL_ELEMENTS","noObf_laneInsets":10,"noObf_nodeToNodeDistance":40,"noObf_minimumEdgeLength":20,"noObf_compactMessageFlowLayering":false,"noObf_startNodesFirst":true}}</y:Json>
+		</data>
+		<node id="n0">
+			<data key="d0">7</data>
+			<data key="d4">
+				<x:List>
+					<y:Label LayoutParameter="{y:GraphMLReference 9}">
+						<y:Label.Text><![CDATA[Вход 
+на сайт]]></y:Label.Text>
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="CLIP" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="587.9375" Y="321.5" Width="60" Height="60"/>
+			</data>
+			<data key="d7">
+				<bpmn:EventNodeStyle minimumSize="20,20"/>
+			</data>
+			<port name="p0">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.9838709677419355,0.5"/>
+				</data>
+			</port>
+			<port name="p1"/>
+		</node>
+		<node id="n1">
+			<data key="d0">8</data>
+			<data key="d4">
+				<x:List>
+					<y:Label LayoutParameter="{y:GraphMLReference 12}">
+						<y:Label.Text><![CDATA[Существует 
+аккаунт?]]></y:Label.Text>
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="CLIP" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="703.6875" Y="301.5" Width="100" Height="100"/>
+			</data>
+			<data key="d7">
+				<bpmn:GatewayNodeStyle type="EXCLUSIVE_WITH_MARKER" minimumSize="20,20"/>
+			</data>
+			<port name="p0">
+				<data key="d16">
+					<y:GraphMLReference ResourceKey="11"/>
+				</data>
+			</port>
+			<port name="p1"/>
+			<port name="p2"/>
+			<port name="p3"/>
+		</node>
+		<node id="n2">
+			<data key="d0">9</data>
+			<data key="d4">
+				<x:List>
+					<y:Label Text="Ввести логин и пароль" LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="835.9375" Y="229" Width="130" Height="50"/>
+			</data>
+			<data key="d7">
+				<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+			</data>
+			<port name="p0"/>
+			<port name="p1"/>
+		</node>
+		<node id="n3">
+			<data key="d0">10</data>
+			<data key="d4">
+				<x:List>
+					<y:Label LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+						<y:Label.Text><![CDATA[Перейти на страницу регистрации]]></y:Label.Text>
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="835.9375" Y="326.50000000000006" Width="130" Height="50"/>
+			</data>
+			<data key="d7">
+				<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+			</data>
+			<port name="p0"/>
+			<port name="p1"/>
+			<port name="p2"/>
+		</node>
+		<node id="n4">
+			<data key="d0">11</data>
+			<data key="d4">
+				<x:List>
+					<y:Label Text="Ввести логин и пароль" LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="1016.1875" Y="229" Width="130" Height="50"/>
+			</data>
+			<data key="d7">
+				<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+			</data>
+			<port name="p0"/>
+			<port name="p1"/>
+			<port name="p2"/>
+		</node>
+		<node id="n5">
+			<data key="d0">12</data>
+			<data key="d4">
+				<x:List>
+					<y:Label LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+						<y:Label.Text><![CDATA[Ввести данные, необходимые для регистрации]]></y:Label.Text>
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="1016.1875" Y="321.50000000000006" Width="130" Height="60"/>
+			</data>
+			<data key="d7">
+				<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+			</data>
+			<port name="p0"/>
+			<port name="p1"/>
+			<port name="p2">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.007575757575757569,0.5"/>
+				</data>
+			</port>
+			<port name="p3"/>
+		</node>
+		<node id="n6">
+			<data key="d0">13</data>
+			<data key="d4">
+				<x:List>
+					<y:Label LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+						<y:Label.Text><![CDATA[Нажать кнопку "Зарегестрироваться"]]></y:Label.Text>
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="1196.4375" Y="229" Width="130" Height="50"/>
+			</data>
+			<data key="d7">
+				<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+			</data>
+			<port name="p0"/>
+			<port name="p1"/>
+			<port name="p2"/>
+			<port name="p3">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.9924242424242424,0.5"/>
+				</data>
+			</port>
+		</node>
+		<node id="n7">
+			<data key="d0">14</data>
+			<data key="d4">
+				<x:List>
+					<y:Label Text="Нажать кнопку &quot;Войти&quot;" LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="1196.4375" Y="326.50000000000006" Width="130" Height="50"/>
+			</data>
+			<data key="d7">
+				<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+			</data>
+			<port name="p0"/>
+			<port name="p1"/>
+			<port name="p2"/>
+			<port name="p3">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0.9924242424242424,0.5"/>
+				</data>
+			</port>
+		</node>
+		<node id="n8">
+			<data key="d0">15</data>
+			<data key="d5">
+				<y:RectD X="1407.20987654321" Y="278.86349206349206" Width="50" Height="50"/>
+			</data>
+			<data key="d7">
+				<bpmn:EventNodeStyle type="TERMINATE" characteristic="END" minimumSize="20,20"/>
+			</data>
+			<port name="p0"/>
+			<port name="p1">
+				<data key="d16">
+					<y:FreeNodePortLocationModelParameter Ratio="0,0.5"/>
+				</data>
+			</port>
+			<port name="p2"/>
+			<port name="p3"/>
+		</node>
+		<node id="n9">
+			<data key="d0">16</data>
+			<data key="d4">
+				<x:List>
+					<y:Label Text="Изменение сообщества" LayoutParameter="{x:Static bpmn:PoolHeaderLabelModel.WEST}">
+						<y:Label.Style>
+							<yjs:LabelStyle>
+								<yjs:LabelStyle.font>
+									<yjs:Font fontSize="12" fontFamily="Roboto" lineSpacing="0.2"/>
+								</yjs:LabelStyle.font>
+							</yjs:LabelStyle>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d5">
+				<y:RectD X="348.6875" Y="591.625" Width="1221.25" Height="604.25"/>
+			</data>
+			<data key="d7">
+				<bpmn:PoolNodeStyle>
+					<yjs:TableNodeStyle tableRenderingOrder="ROWS_FIRST">
+						<yjs:TableNodeStyle.backgroundStyle>
+							<yjs:ShapeNodeStyle fill="{y:GraphMLReference 4}"/>
+						</yjs:TableNodeStyle.backgroundStyle>
+						<yjs:TableNodeStyle.table>
+							<yx:Table Padding="20,0,0,0">
+								<yx:Table.Rows>
+									<yx:Row MinimumSize="50" Size="328.5" Padding="20,0,0,0" Style="{y:GraphMLReference 6}">
+										<yx:Row.Labels>
+											<y:Label Text="User1" LayoutParameter="{x:Static yx:StretchStripeLabelModel.Left}" Style="{y:GraphMLReference 5}"/>
+										</yx:Row.Labels>
+									</yx:Row>
+									<yx:Row MinimumSize="50" Size="255.75" Padding="20,0,0,0" Style="{y:GraphMLReference 6}">
+										<yx:Row.Labels>
+											<y:Label Text="User2" LayoutParameter="{x:Static yx:StretchStripeLabelModel.Left}" Style="{y:GraphMLReference 5}"/>
+										</yx:Row.Labels>
+									</yx:Row>
+								</yx:Table.Rows>
+								<yx:Table.Columns>
+									<yx:Column Style="{y:GraphMLReference 7}" MinimumSize="10" Size="287.5" Padding="0,20,0,0"/>
+									<yx:Column Style="{y:GraphMLReference 7}" MinimumSize="10" Size="893.75" Padding="0,20,0,0"/>
+								</yx:Table.Columns>
+								<yx:Table.RowDefaults>
+									<yx:StripeDefaults Padding="20,0,0,0" Size="200" MinimumSize="50" Style="{y:GraphMLReference 6}">
+										<yx:StripeDefaults.Labels>
+											<y:LabelDefaults AutoAdjustPreferredSize="true" ShareLayoutParameterInstance="true" LayoutParameter="{x:Static yx:StretchStripeLabelModel.Left}" Style="{y:GraphMLReference 5}" ShareStyleInstance="true"/>
+										</yx:StripeDefaults.Labels>
+									</yx:StripeDefaults>
+								</yx:Table.RowDefaults>
+								<yx:Table.ColumnDefaults>
+									<yx:StripeDefaults Padding="0,20,0,0" Size="200" Style="{y:GraphMLReference 7}">
+										<yx:StripeDefaults.Labels>
+											<y:LabelDefaults AutoAdjustPreferredSize="true" ShareLayoutParameterInstance="true" LayoutParameter="{x:Static yx:StretchStripeLabelModel.Top}" ShareStyleInstance="true">
+												<y:LabelDefaults.Style>
+													<yjs:LabelStyle verticalTextAlignment="CENTER" font="{y:GraphMLReference 8}"/>
+												</y:LabelDefaults.Style>
+											</y:LabelDefaults>
+										</yx:StripeDefaults.Labels>
+									</yx:StripeDefaults>
+								</yx:Table.ColumnDefaults>
+							</yx:Table>
+						</yjs:TableNodeStyle.table>
+					</yjs:TableNodeStyle>
+				</bpmn:PoolNodeStyle>
+			</data>
+			<graph id="n9:" edgedefault="directed">
+				<node id="n9::n0">
+					<data key="d0">1</data>
+					<data key="d4">
+						<x:List>
+							<y:Label LayoutParameter="{y:GraphMLReference 9}">
+								<y:Label.Text><![CDATA[Изменение описания
+ сообщества]]></y:Label.Text>
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d5">
+						<y:RectD X="518.4375" Y="682.625" Width="60" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:EventNodeStyle minimumSize="20,20"/>
+					</data>
+					<port name="p0"/>
+				</node>
+				<node id="n9::n1">
+					<data key="d0">2</data>
+					<data key="d4">
+						<x:List>
+							<y:Label>
+								<y:Label.Text><![CDATA[Является ли 
+пользователь админом?]]></y:Label.Text>
+								<y:Label.LayoutParameter>
+									<yx:CompositeLabelModelParameter>
+										<yx:CompositeLabelModelParameter.Parameter>
+											<yx:ExteriorNodeLabelModelParameter Position="Top" Model="{y:GraphMLReference 10}"/>
+										</yx:CompositeLabelModelParameter.Parameter>
+										<yx:CompositeLabelModelParameter.Model>
+											<yx:CompositeLabelModel>
+												<yx:CompositeLabelModel.Models>
+													<yx:CompositeLabelModelModelPair Model="{y:GraphMLReference 10}"/>
+													<yx:CompositeLabelModelModelPair>
+														<yx:CompositeLabelModelModelPair.Model>
+															<yx:InteriorNodeLabelModel/>
+														</yx:CompositeLabelModelModelPair.Model>
+													</yx:CompositeLabelModelModelPair>
+													<yx:CompositeLabelModelModelPair Model="{x:Static yx:FreeNodeLabelModel.Instance}"/>
+												</yx:CompositeLabelModel.Models>
+											</yx:CompositeLabelModel>
+										</yx:CompositeLabelModelParameter.Model>
+									</yx:CompositeLabelModelParameter>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:LabelStyle horizontalTextAlignment="CENTER" wrapping="CLIP" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d5">
+						<y:RectD X="642.1875" Y="662.625" Width="100" Height="100"/>
+					</data>
+					<data key="d7">
+						<bpmn:GatewayNodeStyle type="EXCLUSIVE_WITH_MARKER" minimumSize="20,20"/>
+					</data>
+					<port name="p0">
+						<data key="d16">
+							<y:GraphMLReference ResourceKey="11"/>
+						</data>
+					</port>
+					<port name="p1"/>
+					<port name="p2"/>
+					<port name="p3"/>
+					<port name="p4"/>
+					<port name="p5"/>
+					<port name="p6"/>
+				</node>
+				<node id="n9::n2">
+					<data key="d0">3</data>
+					<data key="d4">
+						<x:List>
+							<y:Label Text="Изменить описание сообщества" LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d5">
+						<y:RectD X="805.9375" Y="682.625" Width="130" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+					</data>
+					<port name="p0"/>
+					<port name="p1"/>
+				</node>
+				<node id="n9::n3">
+					<data key="d0">4</data>
+					<data key="d5">
+						<y:RectD X="1051.1875" Y="682.625" Width="60" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:EventNodeStyle type="TERMINATE" characteristic="END" minimumSize="20,20"/>
+					</data>
+					<port name="p0"/>
+					<port name="p1"/>
+				</node>
+				<node id="n9::n4">
+					<data key="d0">5</data>
+					<data key="d4">
+						<x:List>
+							<y:Label LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+								<y:Label.Text><![CDATA[Написать предложение об обновлении информации администратору группы]]></y:Label.Text>
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d5">
+						<y:RectD X="805.9375" Y="794.125" Width="130" Height="108.5"/>
+					</data>
+					<data key="d7">
+						<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+					</data>
+					<port name="p0"/>
+					<port name="p1"/>
+					<port name="p2"/>
+					<port name="p3"/>
+					<port name="p4"/>
+				</node>
+				<node id="n9::n5">
+					<data key="d0">6</data>
+					<data key="d5">
+						<y:RectD X="805.9375" Y="794.125" Width="25.5" Height="23.625"/>
+					</data>
+					<data key="d7">
+						<bpmn:EventNodeStyle type="MESSAGE" minimumSize="20,20"/>
+					</data>
+				</node>
+				<node id="n9::n6">
+					<data key="d0">7</data>
+					<data key="d5">
+						<y:RectD X="840.9375" Y="1068.375" Width="60" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:EventNodeStyle type="MESSAGE" minimumSize="20,20"/>
+					</data>
+					<port name="p0"/>
+					<port name="p1"/>
+				</node>
+				<node id="n9::n7">
+					<data key="d0">8</data>
+					<data key="d4">
+						<x:List>
+							<y:Label Text="Прочитать сообщение" LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d5">
+						<y:RectD X="947.9375" Y="1077.125" Width="130" Height="42.5"/>
+					</data>
+					<data key="d7">
+						<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+					</data>
+					<port name="p0"/>
+					<port name="p1"/>
+				</node>
+				<node id="n9::n8">
+					<data key="d0">10</data>
+					<data key="d4">
+						<x:List>
+							<y:Label Text="Принять предложение?" LayoutParameter="{y:GraphMLReference 12}">
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="CLIP" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d5">
+						<y:RectD X="1124.9375" Y="1048.375" Width="100" Height="100"/>
+					</data>
+					<data key="d7">
+						<bpmn:GatewayNodeStyle type="EXCLUSIVE_WITH_MARKER" minimumSize="20,20"/>
+					</data>
+					<port name="p0">
+						<data key="d16">
+							<y:GraphMLReference ResourceKey="11"/>
+						</data>
+					</port>
+					<port name="p1"/>
+					<port name="p2"/>
+					<port name="p3"/>
+					<port name="p4"/>
+					<port name="p5"/>
+					<port name="p6"/>
+				</node>
+				<node id="n9::n9">
+					<data key="d0">11</data>
+					<data key="d4">
+						<x:List>
+							<y:Label LayoutParameter="{x:Static yx:StretchNodeLabelModel.Center}">
+								<y:Label.Text><![CDATA[Внести изменения в описание сообщества]]></y:Label.Text>
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" textWrappingShape="LABEL_SHAPE" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d5">
+						<y:RectD X="1271.9375" Y="1068.375" Width="130" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:ActivityNodeStyle minimumSize="40,40"/>
+					</data>
+					<port name="p0"/>
+					<port name="p1"/>
+				</node>
+				<node id="n9::n10">
+					<data key="d0">12</data>
+					<data key="d5">
+						<y:RectD X="1465" Y="1068.375" Width="60" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:EventNodeStyle type="TERMINATE" characteristic="END" minimumSize="20,20"/>
+					</data>
+					<port name="p0"/>
+				</node>
+				<node id="n9::n11">
+					<data key="d0">13</data>
+					<data key="d5">
+						<y:RectD X="1051.1875" Y="818.375" Width="60" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:EventNodeStyle type="TERMINATE" characteristic="END" minimumSize="20,20"/>
+					</data>
+					<port name="p0"/>
+					<port name="p1"/>
+					<port name="p2"/>
+				</node>
+				<node id="n9::n12">
+					<data key="d0">14</data>
+					<data key="d5">
+						<y:RectD X="1306.9375" Y="960.375" Width="60" Height="60"/>
+					</data>
+					<data key="d7">
+						<bpmn:EventNodeStyle type="TERMINATE" characteristic="END" minimumSize="20,20"/>
+					</data>
+					<port name="p0">
+						<data key="d16">
+							<y:FreeNodePortLocationModelParameter Ratio="0.016129032258064502,0.5"/>
+						</data>
+					</port>
+				</node>
+				<edge id="n9::e0" source="n9::n0" target="n9::n1" sourceport="p0" targetport="p4">
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e1" source="n9::n1" target="n9::n2" sourceport="p5" targetport="p0">
+					<data key="d11">
+						<x:List>
+							<y:Label Text="Да" LayoutParameter="{y:GraphMLReference 14}">
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e2" source="n9::n1" target="n9::n4" sourceport="p6" targetport="p0">
+					<data key="d11">
+						<x:List>
+							<y:Label Text="Нет">
+								<y:Label.LayoutParameter>
+									<yx:FreeEdgeLabelModelParameter Ratio="0.2423511985251973" Distance="36.69848967814198"/>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d12">
+						<x:List>
+							<y:Bend Location="692.1875,848.375"/>
+						</x:List>
+					</data>
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e3" source="n9::n2" target="n9::n3" sourceport="p1" targetport="p0">
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e4" source="n9::n4" target="n9::n6" sourceport="p1" targetport="p0">
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e5" source="n9::n4" target="n9::n11" sourceport="p4" targetport="p2">
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e6" source="n9::n6" target="n9::n7" sourceport="p1" targetport="p0">
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e7" source="n9::n7" target="n9::n8" sourceport="p1" targetport="p4">
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e8" source="n9::n8" target="n9::n12" sourceport="p5" targetport="p0">
+					<data key="d11">
+						<x:List>
+							<y:Label Text="Нет">
+								<y:Label.LayoutParameter>
+									<yx:FreeEdgeLabelModelParameter Ratio="0.31222896265062267" Distance="-32.567246231063116"/>
+								</y:Label.LayoutParameter>
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d12">
+						<x:List>
+							<y:Bend Location="1174.9375,990.375"/>
+						</x:List>
+					</data>
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e9" source="n9::n8" target="n9::n9" sourceport="p6" targetport="p0">
+					<data key="d11">
+						<x:List>
+							<y:Label Text="Да" LayoutParameter="{y:GraphMLReference 14}">
+								<y:Label.Style>
+									<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" font="{y:GraphMLReference 3}"/>
+								</y:Label.Style>
+							</y:Label>
+						</x:List>
+					</data>
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+				<edge id="n9::e10" source="n9::n9" target="n9::n10" sourceport="p1" targetport="p0">
+					<data key="d13">
+						<y:GraphMLReference ResourceKey="13"/>
+					</data>
+				</edge>
+			</graph>
+		</node>
+		<edge id="e0" source="n0" target="n1" sourceport="p1" targetport="p1">
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e1" source="n1" target="n2" sourceport="p2" targetport="p0">
+			<data key="d11">
+				<x:List>
+					<y:Label Text="Да">
+						<y:Label.LayoutParameter>
+							<yx:FreeEdgeLabelModelParameter Ratio="0.3001587107556596" Distance="-44.057368445945094"/>
+						</y:Label.LayoutParameter>
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d12">
+				<x:List>
+					<y:Bend Location="753.6875,254"/>
+				</x:List>
+			</data>
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e2" source="n1" target="n3" sourceport="p3" targetport="p1">
+			<data key="d11">
+				<x:List>
+					<y:Label Text="Нет" LayoutParameter="{y:GraphMLReference 14}">
+						<y:Label.Style>
+							<yjs:LabelStyle verticalTextAlignment="CENTER" horizontalTextAlignment="CENTER" wrapping="WRAP_WORD" font="{y:GraphMLReference 3}"/>
+						</y:Label.Style>
+					</y:Label>
+				</x:List>
+			</data>
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e3" source="n2" target="n4" sourceport="p1" targetport="p1">
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e4" source="n4" target="n6" sourceport="p2" targetport="p1">
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e5" source="n3" target="n5" sourceport="p2" targetport="p2">
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e6" source="n5" target="n7" sourceport="p3" targetport="p1">
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e7" source="n6" target="n8" sourceport="p3" targetport="p2">
+			<data key="d12">
+				<x:List>
+					<y:Bend Location="1362.4375,254"/>
+					<y:Bend Location="1362.4375,303.86349206349206"/>
+				</x:List>
+			</data>
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+		<edge id="e8" source="n7" target="n8" sourceport="p3" targetport="p3">
+			<data key="d12">
+				<x:List>
+					<y:Bend Location="1362.4375,351.50000000000006"/>
+					<y:Bend Location="1362.4375,303.86349206349206"/>
+				</x:List>
+			</data>
+			<data key="d13">
+				<y:GraphMLReference ResourceKey="15"/>
+			</data>
+		</edge>
+	</graph>
+</graphml>
