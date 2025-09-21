@@ -1,0 +1,78 @@
+<svg id="scanner" version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     x="0px" y="0px" viewBox="-0.014 -0.957 70 40"
+     enable-background="new -0.014 -0.957 70 40"
+     xml:space="preserve" data-referencesafe="true">
+  <defs>
+    <linearGradient id="SCANNER_ID_01" gradientUnits="userSpaceOnUse" x1="-819.0737" y1="-713.0747" x2="-819.0737"
+                    y2="-728.0299" gradientTransform="matrix(-1 0 0 -1 -784.2295 -713.7578)">
+      <stop offset="0.0606" style="stop-color:#C9C9C9"/>
+      <stop offset="0.0979" style="stop-color:#C1C1C1"/>
+      <stop offset="0.1558" style="stop-color:#ABABAB"/>
+      <stop offset="0.1939" style="stop-color:#999999"/>
+      <stop offset="1" style="stop-color:#969696"/>
+    </linearGradient>
+    <linearGradient id="SCANNER_ID_02" gradientUnits="userSpaceOnUse" x1="229.6851" y1="784.6445" x2="229.6851"
+                    y2="809.2968" gradientTransform="matrix(1 0 0 1 -195.2002 -770.8008)">
+      <stop offset="0.4485" style="stop-color:#B3B3B3"/>
+      <stop offset="0.4655" style="stop-color:#ADADAD"/>
+      <stop offset="0.5194" style="stop-color:#A2A2A2"/>
+      <stop offset="0.5953" style="stop-color:#9B9B9B"/>
+      <stop offset="0.8061" style="stop-color:#999999"/>
+      <stop offset="0.8368" style="stop-color:#868686"/>
+      <stop offset="0.8731" style="stop-color:#787878"/>
+      <stop offset="0.9184" style="stop-color:#707070"/>
+      <stop offset="1" style="stop-color:#6E6E6E"/>
+    </linearGradient>
+    <radialGradient id="SCANNER_ID_03" cx="229.4575" cy="711.6289" r="12.8643"
+                    gradientTransform="matrix(1 0 0 1.1311 -195.2002 -775.039)" gradientUnits="userSpaceOnUse">
+      <stop offset="0.4485" style="stop-color:#B3B3B3"/>
+      <stop offset="0.7229" style="stop-color:#9E9E9E"/>
+      <stop offset="1" style="stop-color:#848484"/>
+    </radialGradient>
+    <linearGradient id="SCANNER_ID_04" gradientUnits="userSpaceOnUse" x1="259.3862" y1="791.2295" x2="199.7717"
+                    y2="791.2295" gradientTransform="matrix(1 0 0 1 -195.2002 -770.8008)">
+      <stop offset="0" style="stop-color:#D9F1FF"/>
+      <stop offset="0.0736" style="stop-color:#D6F0FF"/>
+      <stop offset="0.1144" style="stop-color:#CEEDFF"/>
+      <stop offset="0.1473" style="stop-color:#C1E7FF"/>
+      <stop offset="0.1756" style="stop-color:#ADDEFF"/>
+      <stop offset="0.1939" style="stop-color:#9CD7FF"/>
+      <stop offset="0.4023" style="stop-color:#9FD8FF"/>
+      <stop offset="0.5301" style="stop-color:#A7DCFF"/>
+      <stop offset="0.6362" style="stop-color:#B5E2FF"/>
+      <stop offset="0.7298" style="stop-color:#CAEBFF"/>
+      <stop offset="0.7818" style="stop-color:#D9F1FF"/>
+    </linearGradient>
+    <linearGradient id="SCANNER_ID_05" gradientUnits="userSpaceOnUse" x1="133.7026" y1="-216.9092" x2="133.7026"
+                    y2="-226.7455" gradientTransform="matrix(1 0 0 -1 -97.6001 -202.8145)">
+      <stop offset="0" style="stop-color:#848484"/>
+      <stop offset="0.9939" style="stop-color:#9CD7FF"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#SCANNER_ID_01)" d="M5.58,4.197c-0.004,0,10.86,9.966,10.86,9.966c1.986,0,6.738,0.011,18.525,0.011
+	c9.636,0,16.542,0.184,18.201-0.007l10.717-9.789c3.83-3.21,3.056-4.381-3.396-4.378c0,0-6.451,0.039-25.771,0.032
+	C14.773,0.026,9.112,0,9.112,0C2.366-0.004,2.361,1.043,5.58,4.197z"/>
+
+  <path fill="url(#SCANNER_ID_02)" d="M67.894,26.209L56.345,15.422c-0.797-0.773-3.346-1.203-4.713-1.307c0,0-5.071-0.383-16.858-0.383
+	c-9.636,0-17.334,0.431-17.334,0.431c-1.37,0.077-3.829,0.485-4.724,1.243L1.977,25.752C0.701,26.874,0,27.418,0,28.21
+	c0,0.53,0,6.362,0,6.362c0,1.371,1.118,2.584,2.484,2.695c0,0,12.681,1.037,32.001,1.043c19.942,0.006,32.002-1.031,32.002-1.031
+	c1.365-0.118,2.481-1.336,2.481-2.707v-6.828C68.97,26.75,67.894,26.209,67.894,26.209z M33.312,24.605c-0.047,0-0.095,0-0.142,0
+	C33.217,24.605,33.264,24.605,33.312,24.605z"/>
+
+  <path opacity="0.6" fill="url(#SCANNER_ID_03)" stroke="#848484" stroke-width="0.25" stroke-miterlimit="10"
+        enable-background="new    " d="
+	M34.257,32.641c6.938,0,12.563-2.191,12.563-4.896c0,0-3.396-0.617-12.334-0.617c-8.624-0.013-12.791,0.617-12.791,0.617
+	C21.694,30.447,27.319,32.641,34.257,32.641z"/>
+
+  <path fill="url(#SCANNER_ID_04)" d="M64.44,26.208c0.014,0.001,0.014,0.001,0.014,0.001L54.298,16.18
+	c-0.875-0.887-2.095-1.137-4.271-1.184c0,0-4.597-0.348-15.281-0.348c-8.734,0-15.712,0.391-15.712,0.391
+	c-2.861,0.098-3.611,0.504-4.281,1.128L5.02,26.012C5.019,26.012,64.425,26.207,64.44,26.208z"/>
+
+  <path opacity="0.58" fill="url(#SCANNER_ID_05)" enable-background="new    " d="M58.608,20.43c1.894,1.863,5.846,5.779,5.846,5.779
+	L54.298,16.18c-0.875-0.887-2.095-1.137-4.271-1.184c0,0-4.597-0.348-15.281-0.348c-8.734,0-15.712,0.391-15.712,0.391
+	c-2.861,0.098-3.611,0.504-4.281,1.128l-7.002,7.081c0,0,0.564,0.999,1.984,0.92c8.348-0.463,39.309-2.4,47.875-2.875
+	C59.111,21.21,58.606,20.43,58.608,20.43z"/>
+  <rect x="64.454" y="29.52" fill="#C8FF00" stroke="#717171" stroke-width="0.112" stroke-miterlimit="10" width="4.517"
+        height="2.293"/>
+</svg>

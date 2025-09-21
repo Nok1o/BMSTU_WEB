@@ -1,0 +1,283 @@
+@keyframes opacity-load {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.app-loading .header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 104px;
+  background-color: #86a3c2;
+  animation: 5s opacity-load forwards;
+}
+.app-loading .logo {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: 21px;
+  left: 17px;
+  border-radius: 50%;
+  background-color: #ffffff;
+}
+.app-loading .placeholder {
+  opacity: 0;
+  border-radius: 8px;
+  background-color: #cfdae7;
+}
+.app-loading .tab {
+  position: absolute;
+  right: 0;
+  width: 374px;
+  height: 38px;
+  opacity: 0;
+  background-color: #f5f5f5;
+  border-top: 1px solid #b3b3b3;
+}
+.app-loading .dark {
+  background-color: #86a3c2;
+}
+.app-loading .app-title {
+  height: 24px;
+  position: absolute;
+  top: 21px;
+  left: 62px;
+  width: 77px;
+  animation: 2s opacity-load 1s forwards;
+}
+.app-loading .document-title {
+  height: 24px;
+  position: absolute;
+  top: 21px;
+  left: 170px;
+  width: 167px;
+  animation: 2s opacity-load 1.2s forwards;
+}
+.app-loading .search {
+  position: absolute;
+  right: 110px;
+  width: 24px;
+  top: 21px;
+  height: 24px;
+  animation: 2s opacity-load 1.4s forwards;
+}
+.app-loading .help {
+  position: absolute;
+  right: 60px;
+  width: 24px;
+  top: 21px;
+  height: 24px;
+  animation: 2s opacity-load 1.5s forwards;
+}
+.app-loading .shrink {
+  position: absolute;
+  right: 12px;
+  width: 24px;
+  top: 21px;
+  height: 24px;
+  animation: 2s opacity-load 1.6s forwards;
+}
+.app-loading .menu {
+  position: absolute;
+  left: 14px;
+  top: 73px;
+  width: 24px;
+  height: 24px;
+  animation: 2s opacity-load 1.8s forwards;
+}
+.app-loading .edit {
+  position: absolute;
+  left: 67px;
+  top: 73px;
+  width: 33px;
+  height: 24px;
+  animation: 2s opacity-load 2s forwards;
+}
+.app-loading .layout {
+  position: absolute;
+  left: 133px;
+  top: 73px;
+  width: 60px;
+  height: 24px;
+  animation: 2s opacity-load 2.2s forwards;
+}
+.app-loading .sidebar {
+  position: absolute;
+  top: 104px;
+  bottom: 0;
+  right: 0;
+  width: 375px;
+  border-left: 1px solid #f5f5f5;
+  opacity: 0;
+  animation: 2s opacity-load 2.4s forwards;
+}
+.app-loading .new {
+  position: absolute;
+  right: 267px;
+  top: 110px;
+  width: 75px;
+  height: 28px;
+  animation: 2s opacity-load 2.6s forwards;
+}
+.app-loading .import {
+  position: absolute;
+  right: 104px;
+  top: 110px;
+  width: 100px;
+  height: 28px;
+  animation: 2s opacity-load 2.8s forwards;
+}
+.app-loading .filter {
+  position: absolute;
+  right: 24px;
+  top: 110px;
+  width: 28px;
+  height: 28px;
+  animation: 2s opacity-load 3s forwards;
+}
+.app-loading .recently-used {
+  top: 145px;
+  height: 30px;
+  animation: 2s opacity-load 3.2s forwards;
+}
+.app-loading .shape-nodes {
+  top: 235px;
+  animation: 2s opacity-load 3.4s forwards;
+}
+.app-loading .node {
+  background-color: #ffba6c;
+  opacity: 0;
+  border-radius: 8px;
+  position: absolute;
+  width: 37px;
+  height: 37px;
+}
+
+
+.app-loading .shape1 {
+  top: 292px;
+  right: 323px;
+  animation: .2s opacity-load 3.5s forwards;
+}
+.app-loading .shape2 {
+  top: 292px;
+  right: 274px;
+  animation: .2s opacity-load 3.6s forwards;
+}
+.app-loading .shape3 {
+  top: 292px;
+  right: 223px;
+  animation: .2s opacity-load 3.7s forwards;
+}
+.app-loading .shape4 {
+  top: 292px;
+  right: 173px;
+  animation: .2s opacity-load 3.8s forwards;
+}
+.app-loading .shape5 {
+  top: 292px;
+  right: 124px;
+  animation: .2s opacity-load 3.9s forwards;
+}
+.app-loading .shape6 {
+  top: 292px;
+  right: 73px;
+  animation: .2s opacity-load 4s forwards;
+}
+.app-loading .shape7 {
+  top: 292px;
+  right: 23px;
+  animation: .2s opacity-load 4.1s forwards;
+}
+.app-loading .shape8 {
+  top: 342px;
+  right: 323px;
+  animation: .2s opacity-load 3.6s forwards;
+}
+.app-loading .shape9 {
+  top: 342px;
+  right: 274px;
+  animation: .2s opacity-load 3.7s forwards;
+}
+.app-loading .shape10 {
+  top: 342px;
+  right: 223px;
+  animation: .2s opacity-load 3.8s forwards;
+}
+.app-loading .shape11 {
+  top: 342px;
+  right: 173px;
+  animation: .2s opacity-load 3.9s forwards;
+}
+.app-loading .shape12 {
+  top: 342px;
+  right: 124px;
+  animation: .2s opacity-load 4.0s forwards;
+}
+.app-loading .shape13 {
+  top: 342px;
+  right: 73px;
+  animation: .2s opacity-load 4.1s forwards;
+}
+.app-loading .shape14 {
+  top: 342px;
+  right: 23px;
+  animation: .2s opacity-load 4.2s forwards;
+}
+.app-loading .shape15 {
+  top: 392px;
+  right: 323px;
+  animation: .2s opacity-load 3.6s forwards;
+}
+.app-loading .shape16 {
+  top: 392px;
+  right: 274px;
+  animation: .2s opacity-load 3.7s forwards;
+}
+.app-loading .shape17 {
+  top: 392px;
+  right: 223px;
+  animation: .2s opacity-load 3.8s forwards;
+}
+
+
+.app-loading .shiny-nodes {
+  top: 445px;
+  animation: .2s opacity-load 4.2s forwards;
+}
+.app-loading .flowchart {
+  top: 483px;
+  animation: .2s opacity-load 4.3s forwards;
+}
+.app-loading .network {
+  top: 521px;
+  animation: .2s opacity-load 4.4s forwards;
+}
+.app-loading .people {
+  top: 559px;
+  animation: .2s opacity-load 4.5s forwards;
+}
+.app-loading .groups {
+  top: 597px;
+  animation: .2s opacity-load 4.6s forwards;
+}
+.app-loading .uml {
+  top: 635px;
+  animation: .2s opacity-load 4.7s forwards;
+}
+.app-loading .bpmn {
+  top: 673px;
+  animation: .2s opacity-load 4.8s forwards;
+}
+.app-loading .table {
+  top: 711px;
+  animation: .2s opacity-load 4.9s forwards;
+}
+.app-loading .edges {
+  top: 749px;
+  animation: .2s opacity-load 5s forwards;
+}
