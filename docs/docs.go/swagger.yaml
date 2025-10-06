@@ -1,0 +1,2895 @@
+openapi: 3.1.1
+info:
+  title: Social Network API
+  version: "1.0.0"
+  description: API для социальной сети с функциями общения, постов и сообществ
+  contact:
+    name: API Support
+    email: support@quickflowapp.com
+servers:
+  - url: http://localhost:8080
+    description: Local server for development
+  - url: https://quickflowapp.ru
+    description: Production server
+
+components:
+  securitySchemes:
+    SessionAuth:
+      type: apiKey
+      in: cookie
+      name: session
+
+
+  schemas:
+    forms.AuthForm:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: "johndoe"
+          description: Имя пользователя
+        password:
+          type: string
+          format: password
+          example: "SecurePass123!"
+          description: Пароль пользователя
+
+    forms.ChatOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+          description: UUID чата
+        name:
+          type: string
+          example: "John Doe"
+          description: Название чата
+        username:
+          type: string
+          example: "johndoe"
+          description: Имя пользователя собеседника
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/avatars/johndoe.jpg"
+          description: URL аватара чата
+        type:
+          type: string
+          enum: ["direct", "group"]
+          example: "direct"
+          description: Тип чата
+        online:
+          type: boolean
+          example: true
+          description: Онлайн статус собеседника
+        last_message:
+          $ref: '#/components/schemas/forms.MessageOut'
+        unread_messages:
+          type: integer
+          example: 3
+          description: Количество непрочитанных сообщений
+        last_read_by_me:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+          description: Время последнего прочтения мной
+        last_read_by_other:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:05:00Z"
+          description: Время последнего прочтения собеседником
+        last_seen:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:10:00Z"
+          description: Время последней активности
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-09-01T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:10:00Z"
+
+    forms.CommentForm:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "Отличный пост! Мне очень понравилось."
+          description: Текст комментария
+        media:
+          type: array
+          items:
+            type: string
+            format: uuid
+            example: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+          description: UUID медиа файлов
+        files:
+          type: array
+          items:
+            type: string
+            format: uuid
+            example: "b2c3d4e5-f6g7-8901-bcde-f23456789012"
+          description: UUID файлов
+        audio:
+          type: array
+          items:
+            type: string
+            format: uuid
+            example: "c3d4e5f6-g7h8-9012-cdef-345678901234"
+          description: UUID аудио файлов
+
+    forms.CommentOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "d4e5f6g7-h8i9-0123-defg-456789012345"
+        post_id:
+          type: string
+          format: uuid
+          example: "e5f6g7h8-i9j0-1234-efgh-567890123456"
+        author:
+          $ref: '#/components/schemas/forms.PublicUserInfoOut'
+        text:
+          type: string
+          example: "Это очень интересный комментарий!"
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        audio:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        is_liked:
+          type: boolean
+          example: true
+        like_count:
+          type: integer
+          example: 15
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T10:30:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T10:30:00Z"
+
+    forms.CommunityForm:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+        community:
+          $ref: '#/components/schemas/forms.CommunityInfo'
+#        contact_info:
+#          $ref: '#/components/schemas/forms.ContactInfo'
+        owner:
+          $ref: '#/components/schemas/forms.PublicUserInfoOut'
+#        owner_id:
+#          type: string
+#          format: uuid
+#          example: "550e8400-e29b-41d4-a716-446655440000"
+        role:
+          type: string
+          enum: ["owner", "admin", "member", "any"]
+          example: "owner"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-01-15T09:00:00Z"
+
+    forms.CommunityInfo:
+      type: object
+      required:
+        - name
+        - nickname
+      properties:
+        name:
+          type: string
+          example: "Tech Enthusiasts"
+          description: Название сообщества
+        nickname:
+          type: string
+          example: "techlovers"
+          description: Уникальное имя сообщества
+        description:
+          type: string
+          example: "Сообщество для обсуждения технологий и инноваций"
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/communities/techlovers/avatar.jpg"
+        cover_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/communities/techlovers/cover.jpg"
+
+    forms.CommunityMemberOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        user_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        community_id:
+          type: string
+          format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+        firstname:
+          type: string
+          example: "John"
+        lastname:
+          type: string
+          example: "Doe"
+        username:
+          type: string
+          example: "johndoe"
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/avatars/johndoe.jpg"
+        role:
+          type: string
+          enum: ["owner", "admin", "member"]
+          example: "member"
+        relation:
+          $ref: '#/components/schemas/models.UserRelation'
+        online:
+          type: boolean
+          example: true
+        joined_at:
+          type: string
+          format: date-time
+          example: "2023-02-20T14:30:00Z"
+
+    forms.ContactInfo:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: "contact@techlovers.com"
+        phone:
+          type: string
+          example: "+1234567890"
+        city:
+          type: string
+          example: "Москва"
+
+    forms.LikeForm:
+      type: object
+      properties:
+        target_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+          description: ID объекта для лайка
+        target_type:
+          type: string
+          enum: ["post", "comment"]
+          example: "post"
+          description: Тип объекта для лайка
+        user_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440001"
+          description: ID пользователя, ставящего лайк
+
+    forms.ErrorForm:
+      type: object
+      properties:
+        error_code:
+          type: string
+        message:
+          type: string
+
+    forms.FileOut:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "profile.jpg"
+        url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/files/profile.jpg"
+
+    forms.FriendRequest:
+      type: object
+      required:
+        - receiver_id
+      properties:
+        status:
+          type: string
+          example: "accepted"
+          description: Статус для изменения
+
+    forms.FriendRequestDel:
+      type: object
+      required:
+        - friend_id
+      properties:
+        friend_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+          description: ID друга для удаления
+
+    forms.FriendsInfoOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        firstname:
+          type: string
+          example: "John"
+        lastname:
+          type: string
+          example: "Doe"
+        username:
+          type: string
+          example: "johndoe"
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/avatars/johndoe.jpg"
+        is_online:
+          type: boolean
+          example: true
+
+    forms.GetNumUnreadChatsForm:
+      type: object
+      properties:
+        count:
+          type: integer
+          example: 5
+          description: Количество непрочитанных чатов
+
+    forms.MessageForm:
+      type: object
+      properties:
+        chat_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        receiver_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440001"
+        text:
+          type: string
+          example: "Привет! Как дела?"
+        media:
+          type: array
+          items:
+            type: string
+            format: uuid
+        files:
+          type: array
+          items:
+            type: string
+            format: uuid
+        audio:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    forms.MessageOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        chat_id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        sender:
+          $ref: '#/components/schemas/forms.PublicUserInfoOut'
+        text:
+          type: string
+          example: "Привет! Как дела?"
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        audio:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+
+    forms.PayloadWrapper-array_forms_CommunityForm:
+      type: object
+      properties:
+        payload:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.CommunityForm'
+
+    forms.PayloadWrapper-array_forms_CommunityMemberOut:
+      type: object
+      properties:
+        payload:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.CommunityMemberOut'
+
+    forms.PayloadWrapper-forms_CommunityForm:
+      type: object
+      properties:
+        payload:
+          $ref: '#/components/schemas/forms.CommunityForm'
+
+    forms.PayloadWrapper-forms_GetNumUnreadChatsForm:
+      type: object
+      properties:
+        payload:
+          $ref: '#/components/schemas/forms.GetNumUnreadChatsForm'
+
+    forms.PostOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        author:
+          $ref: '#/components/schemas/forms.PublicUserInfoOut'
+        author_type:
+          type: string
+          enum: ["user", "community"]
+          example: "user"
+        text:
+          type: string
+          example: "Сегодня прекрасный день для программирования!"
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        audio:
+          type: array
+          items:
+            $ref: '#/components/schemas/forms.FileOut'
+        is_liked:
+          type: boolean
+          example: true
+        is_repost:
+          type: boolean
+          example: false
+        like_count:
+          type: integer
+          example: 42
+        repost_count:
+          type: integer
+          example: 7
+        comment_count:
+          type: integer
+          example: 15
+        last_comment:
+          $ref: '#/components/schemas/forms.CommentOut'
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2023-10-01T10:00:00Z"
+
+    forms.ProfileForm:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+#        chat_id:
+#          type: string
+#          format: uuid
+#          example: "550e8400-e29b-41d4-a716-446655440000"
+        profile:
+          $ref: '#/components/schemas/forms.ProfileInfo'
+#        contact_info:
+#          $ref: '#/components/schemas/forms.ContactInfo'
+#        school:
+#          $ref: '#/components/schemas/forms.SchoolEducationForm'
+#        university:
+#          $ref: '#/components/schemas/forms.UniversityEducationForm'
+#        relation:
+#          $ref: '#/components/schemas/models.UserRelation'
+        online:
+          type: boolean
+          example: true
+        last_seen:
+          type: string
+          format: date-time
+          example: "2023-10-01T12:00:00Z"
+
+    forms.ProfileInfo:
+      type: object
+      properties:
+        firstname:
+          type: string
+          example: "John"
+        lastname:
+          type: string
+          example: "Doe"
+        username:
+          type: string
+          example: "johndoe"
+        birth_date:
+          type: string
+          format: date
+          example: "1990-01-01"
+        sex:
+          type: integer
+          enum: [0, 1, 2]
+          example: 1
+          description: "0 - не указан, 1 - мужской, 2 - женский"
+        bio:
+          type: string
+          example: "Разработчик программного обеспечения"
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/avatars/johndoe.jpg"
+        cover_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/covers/johndoe.jpg"
+
+    forms.PublicUserInfoOut:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        firstname:
+          type: string
+          example: "John"
+        lastname:
+          type: string
+          example: "Doe"
+        username:
+          type: string
+          example: "johndoe"
+        avatar_url:
+          type: string
+          format: uri
+          example: "https://cdn.socialnetwork.com/avatars/johndoe.jpg"
+        online:
+          type: boolean
+          example: true
+#        relation:
+#          $ref: '#/components/schemas/models.UserRelation'
+
+    forms.SchoolEducationForm:
+      type: object
+      properties:
+        school_name:
+          type: string
+          example: "Лицей №153"
+        school_city:
+          type: string
+          example: "Москва"
+
+    forms.SignUpForm:
+      type: object
+      required:
+        - username
+        - password
+        - firstname
+        - lastname
+        - birth_date
+        - sex
+      properties:
+        username:
+          type: string
+          example: "johndoe"
+          minLength: 3
+          maxLength: 20
+        password:
+          type: string
+          format: password
+          example: "SecurePass123!"
+          minLength: 8
+        firstname:
+          type: string
+          example: "John"
+        lastname:
+          type: string
+          example: "Doe"
+        birth_date:
+          type: string
+          format: date
+          example: "1990-01-01"
+        sex:
+          type: integer
+          enum: [1, 2]
+          example: 1
+          description: "1 - мужской, 2 - женский"
+
+    forms.UniversityEducationForm:
+      type: object
+      properties:
+        univ_name:
+          type: string
+          example: "МГУ"
+        univ_city:
+          type: string
+          example: "Москва"
+        faculty:
+          type: string
+          example: "Факультет вычислительной математики и кибернетики"
+        grad_year:
+          type: integer
+          example: 2015
+
+    forms.UpdatePostForm:
+      type: object
+      properties:
+        text:
+          type: string
+          example: "Обновленный текст поста"
+        media:
+          type: array
+          items:
+            type: string
+            format: uuid
+        files:
+          type: array
+          items:
+            type: string
+            format: uuid
+        audio:
+          type: array
+          items:
+            type: string
+            format: uuid
+
+    forms.Session:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        expires_at:
+          type: string
+          format: date-time
+          example: "2023-10-02T12:00:00Z"
+    forms.SignupResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+    models.UserRelation:
+      type: string
+      enum:
+        - friend
+        - following
+        - followed_by
+        - stranger
+        - self
+        - ""
+      example: "friend"
+      description: |
+        friend - друзья
+        following - пользователь подписан на другого
+        followed_by - на пользователя подписан другой
+        stranger - незнакомец
+        self - собственный профиль
+        "" - отношение не определено
+
+paths:
+#  /api/v2/csrf:
+#    get:
+#      summary: Получить CSRF токен
+#      description: Возвращает CSRF токен для защиты от межсайтовой подделки запросов
+#      tags:
+#        - Auth
+#      responses:
+#        "200":
+#          description: CSRF токен
+#          headers:
+#            X-CSRF-Token:
+#              schema:
+#                type: string
+#              description: CSRF токен
+#        "500":
+#          description: Ошибка сервера
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/sessions:
+    post:
+      summary: Аутентификация пользователя
+      description: Аутентифицирует пользователя и создает сессию
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.AuthForm'
+      responses:
+        "201":
+          description: Сессия создана
+          headers:
+            Location:
+              schema:
+                type: string
+              description: URI созданной сессии
+            Set-Cookie:
+              schema:
+                type: string
+              description: Session cookie (HttpOnly; Secure; SameSite)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.Session'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Неверные учетные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/sessions/me:
+    delete:
+      summary: Выход из системы
+      description: Завершает сессию пользователя
+      tags:
+        - Auth
+      security:
+        - SessionAuth: []
+      responses:
+        "204":
+          description: Успешный выход
+        "401":
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Недостаточно прав на удаление сессии
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Сессия не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/users:
+    post:
+      summary: Регистрация пользователя
+      description: Создает новую учетную запись пользователя
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.SignUpForm'
+      responses:
+        "201":
+          description: Успешная регистрация
+          headers:
+            Cookie:
+              schema:
+                type: string
+              description: Session cookie (HttpOnly; Secure; SameSite)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.SignupResponse'
+
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "409":
+          description: Пользователь с таким именем уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+    get:
+      summary: Поиск пользователей с именем, похожим на указанный
+      description: Ищет пользователей по запросу
+      tags:
+        - Users
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: query
+          name: to_search
+          required: true
+          schema:
+            type: string
+          example: "john"
+        - in: query
+          name: count
+          required: true
+          schema:
+            type: integer
+          example: 10
+      responses:
+        "200":
+          description: Список найденных пользователей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.PublicUserInfoOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/profiles/me:
+    patch:
+      summary: Обновить профиль пользователя
+      description: Обновляет профиль текущего пользователя
+      tags:
+        - Users
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              name: profile
+              required:
+                - firstname
+                - lastname
+                - birth_date
+                - sex
+                - bio
+              properties:
+                firstname:
+                  type: string
+                  example: "John"
+                lastname:
+                  type: string
+                  example: "Doe"
+                birth_date:
+                  type: string
+                  format: date
+                  example: "1990-01-01"
+                sex:
+                  type: integer
+                  enum: [1, 2]
+                  example: 1
+                bio:
+                  type: string
+                  example: "Разработчик программного обеспечения"
+                avatar:
+                  type: string
+                  format: binary
+                cover:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Профиль обновлен
+        "400":
+          description: Неверные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/profiles/{username}:
+    get:
+      summary: Получить профиль пользователя
+      description: Возвращает профиль пользователя по имени
+      tags:
+        - Users
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+      security:
+        - SessionAuth: []
+      responses:
+        "200":
+          description: Профиль пользователя
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ProfileForm'
+        "404":
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/users/{user_id}/friends:
+    get:
+      summary: Получить список друзей
+      description: Возвращает список друзей пользователя
+      tags:
+        - Friends
+      parameters:
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+        - in: query
+          name: count
+          schema:
+              type: integer
+              default: 10
+          description: Количество друзей для возврата
+        - in: query
+          name: offset
+          schema:
+              type: integer
+              default: 0
+          description: Смещение для пагинации
+        - in: query
+          name: request_type
+          schema:
+              type: string
+              enum: ["outcoming", "incoming", "friend"]
+              default: "friend"
+      responses:
+        "200":
+          description: Список друзей
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.FriendsInfoOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/friends/{friend_id}:
+    delete:
+      summary: Удалить из друзей
+      description: Удаляет пользователя из списка друзей
+      tags:
+        - Friends
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: friend_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "204":
+          description: Пользователь удален из друзей
+          no content: true
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/friend_requests:
+    post:
+      summary: Отправить запрос на добавление в друзья
+      description: Отправляет запрос в друзья пользователю
+      tags:
+        - Friends
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - receiver_id
+              properties:
+                receiver_id:
+                  type: string
+                  example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Запрос отправлен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  request_id:
+                    type: string
+                    format: uuid
+                    example: "550e8400-e29b-41d4-a716-446655440000"
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "409":
+          description: Отношение уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/friend_requests/{request_id}:
+    put:
+      summary: Изменить статус запроса в друзья
+      description: Изменяет статус запроса в друзья (принять или отклонить)
+      tags:
+        - Friends
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: request_id
+          required: true
+          schema:
+            type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.FriendRequest'
+      responses:
+        "200":
+          description: Запрос принят
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Запрос не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+    delete:
+      summary: Удалить запрос в друзья
+      description: Удаляет запрос в друзья
+      tags:
+        - Friends
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: request_id
+          required: true
+          schema:
+            type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "204":
+          description: Запрос удален
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Запрос не найден
+        "500":
+          description: Ошибка сервера
+
+  /api/v2/users/{username}/communities:
+    get:
+      summary: Получить сообщества пользователя
+      description: Возвращает список сообществ, в которых состоит пользователь
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          example: "johndoe"
+        - in: query
+          name: count
+          schema:
+            type: integer
+            default: 20
+          description: Количество сообществ для возврата
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+          description: Временная метка для пагинации
+        - in: query
+          name: role
+          schema:
+            type: string
+            enum: ["owner", "admin", "member"]
+          description: Фильтр по роли в сообществе
+      responses:
+        "200":
+          description: Список сообществ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.CommunityForm'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/users/{username}/posts:
+    get:
+      summary: Получить посты пользователя
+      description: Возвращает список постов пользователя
+      tags:
+        - Posts
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          example: "johndoe"
+        - in: query
+          name: count
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+          example: "2023-10-01T12:00:00Z"
+      responses:
+        "200":
+          description: Список постов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.PostOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/posts:
+    post:
+      summary: Создать пост пользователя
+      description: Создает новый пост пользователя
+      tags:
+        - Posts
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.CommentForm'
+      responses:
+        "201":
+          description: Пост создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.PostOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+    get:
+      summary: Получить ленту
+      description: Возвращает ленту постов
+      tags:
+        - Posts
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: query
+          name: count
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+          example: "2023-10-01T12:00:00Z"
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: ["feed", "recommendations"]
+          example: "feed"
+      responses:
+        "200":
+          description: Список постов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.PostOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/posts/{post_id}:
+    get:
+      summary: Получить пост
+      description: Возвращает пост по ID
+      tags:
+        - Posts
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "200":
+          description: Данные поста
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.PostOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Пост не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+    patch:
+      summary: Обновить пост
+      description: Обновляет существующий пост
+      tags:
+        - Posts
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.UpdatePostForm'
+      responses:
+        "200":
+          description: Пост обновлен
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Пост не принадлежит пользователю
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Пост не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+    delete:
+      summary: Удалить пост
+      description: Удаляет пост
+      tags:
+        - Posts
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "204":
+          description: Пост удален
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Пост не принадлежит пользователю
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Пост не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/posts/{post_id}/likes:
+    post:
+      summary: Поставить лайк на пост
+      description: Создает новый лайк для поста
+      tags:
+        - Likes
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "201":
+          description: Лайк создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.LikeForm'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Целевой объект не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "409":
+          description: Лайк уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+#    get:
+#      summary: Получить список лайков поста
+#      description: Возвращает список лайков для поста
+#      tags:
+#        - Likes
+#      security:
+#        - SessionAuth: []
+#      parameters:
+#        - in: query
+#          name: offset
+#          schema:
+#            type: int
+#            default: 0
+#        - in: query
+#          name: count
+#          schema:
+#            type: int
+#            default: 10
+#      responses:
+#        "200":
+#          description: Список лайков
+#          content:
+#            application/json:
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/forms.LikeForm'
+#        "400":
+#          description: Некорректные параметры
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "500":
+#          description: Ошибка сервера
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/posts/{post_id}/comments/{comment_id}/likes:
+    post:
+      summary: Поставить лайк на комментарий
+      description: Создает новый лайк для комментария
+      tags:
+        - Likes
+      security:
+        - SessionAuth: [ ]
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - in: path
+          name: comment_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "201":
+          description: Лайк создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.LikeForm'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Целевой объект не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "409":
+          description: Лайк уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+#    get:
+#      summary: Получить список лайков комментария
+#      description: Возвращает список лайков для комментария
+#      tags:
+#        - Likes
+#      security:
+#        - SessionAuth: []
+#      parameters:
+#        - in: query
+#          name: offset
+#          schema:
+#            type: int
+#            default: 0
+#        - in: query
+#          name: count
+#          schema:
+#            type: int
+#            default: 10
+#      responses:
+#        "200":
+#          description: Список лайков
+#          content:
+#            application/json:
+#              schema:
+#                type: array
+#                items:
+#                  $ref: '#/components/schemas/forms.LikeForm'
+#        "400":
+#          description: Некорректные параметры
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "500":
+#          description: Ошибка сервера
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+
+
+
+  /api/v2/posts/{post_id}/likes/me:
+    delete:
+      summary: Убрать лайк с поста
+      description: Удаляет лайк текущего пользователя с поста
+      tags:
+        - Likes
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "204":
+          description: Лайк удален
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Лайк или целевой объект не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/posts/{post_id}/comments/{comment_id}/likes/me:
+    delete:
+      summary: Убрать лайк с комментария
+      description: Удаляет лайк текущего пользователя с комментария
+      tags:
+        - Likes
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - in: path
+          name: comment_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      security:
+        - SessionAuth: []
+      responses:
+        "204":
+          description: Лайк удален
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Лайк или целевой объект не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/posts/{post_id}/comments:
+    get:
+      summary: Получить комментарии поста
+      description: Возвращает комментарии для указанного поста
+      tags:
+        - Comments
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - in: query
+          name: count
+          schema:
+            type: integer
+          example: 10
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+          example: "2023-10-01T12:00:00Z"
+      responses:
+        "200":
+          description: Список комментариев
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.CommentOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+    post:
+      summary: Добавить комментарий
+      description: Добавляет комментарий к посту
+      tags:
+        - Comments
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.CommentForm'
+      responses:
+        "201":
+          description: Комментарий добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.CommentOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/posts/{post_id}/comments/{comment_id}:
+#    get:
+#      summary: Получить комментарий
+#      description: Возвращает комментарий по ID
+#      tags:
+#        - Comments
+#      security:
+#        - SessionAuth: []
+#      parameters:
+#        - in: path
+#          name: comment_id
+#          required: true
+#          schema:
+#            type: string
+#            format: uuid
+#          example: "d4e5f6g7-h8i9-0123-defg-456789012345"
+#      responses:
+#        "200":
+#          description: Данные комментария
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.CommentOut'
+#        "404":
+#          description: Комментарий не найден
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "500":
+#          description: Ошибка сервера
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+
+    patch:
+      summary: Обновить комментарий
+      description: Обновляет комментарий
+      tags:
+        - Comments
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "d4e5f6g7-h8i9-0123-defg-456789012345"
+        - in: path
+          name: comment_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "d4e5f6g7-h8i9-0123-defg-456789012345"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.CommentForm'
+      responses:
+        "200":
+          description: Комментарий обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.CommentOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Комментарий не принадлежит пользователю
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Комментарий не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+    delete:
+      summary: Удалить комментарий
+      description: Удаляет комментарий
+      tags:
+        - Comments
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "d4e5f6g7-h8i9-0123-defg-456789012345"
+        - in: path
+          name: comment_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "d4e5f6g7-h8i9-0123-defg-456789012345"
+      responses:
+        "204":
+          description: Комментарий удален
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Комментарий не принадлежит пользователю
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Комментарий не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+#  /api/v2/comments/{comment_id}/likes:
+#    post:
+#      summary: Лайкнуть комментарий
+#      description: Ставит лайк на комментарий
+#      tags:
+#        - Comments
+#      security:
+#        - SessionAuth: []
+#      parameters:
+#        - in: path
+#          name: comment_id
+#          required: true
+#          schema:
+#            type: string
+#            format: uuid
+#          example: "d4e5f6g7-h8i9-0123-defg-456789012345"
+#      responses:
+#        "204":
+#          description: Лайк поставлен
+#        "400":
+#          description: Некорректные данные
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "404":
+#          description: Комментарий не найден
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "500":
+#          description: Ошибка сервера
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/communities:
+    post:
+      summary: Создать сообщество
+      description: Создает новое сообщество
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - nickname
+                - name
+              properties:
+                nickname:
+                  type: string
+                  example: "techlovers"
+                name:
+                  type: string
+                  example: "Tech Enthusiasts"
+                description:
+                  type: string
+                  example: "Сообщество для обсуждения технологий"
+                avatar:
+                  type: string
+                  format: binary
+                cover:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Сообщество создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.CommunityForm'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+    get:
+      summary: Поиск сообществ с именем, похожим на указанное
+      description: Ищет сообщества по запросу
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: query
+          name: to_search
+          required: true
+          schema:
+            type: string
+          example: "tech"
+        - in: query
+          name: count
+          required: true
+          schema:
+            type: integer
+          example: 10
+      responses:
+        "200":
+          description: Список найденных сообществ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.CommunityForm'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/communities/{community_id}:
+    get:
+      summary: Получить сообщество по ID
+      description: Возвращает информацию о сообществе по ID
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: community_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+      responses:
+        "200":
+          description: Информация о сообществе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.CommunityForm'
+        "404":
+          description: Сообщество не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+    delete:
+      summary: Удалить сообщество
+      description: Удаляет сообщество по ID
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: community_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+      responses:
+        "204":
+          description: Сообщество удалено
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Нет прав для удаления
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Сообщество не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/communities/{community_id}/members:
+    post:
+      summary: Вступить в сообщество
+      description: Вступает в сообщество
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: community_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+      responses:
+        "204":
+          description: Вступление успешно
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Сообщество не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+    get:
+      summary: Получить участников сообщества
+      description: Возвращает список участников сообщества
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: community_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+        - in: query
+          name: count
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Список участников
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.CommunityMemberOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Сообщество не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/communities/{community_id}/members/{user_id}:
+    delete:
+      summary: Покинуть сообщество
+      description: Покидает сообщество
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: community_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        "204":
+          description: Выход успешен
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Сообщество не найдено или пользователь не участник
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+    patch:
+      summary: Изменить роль участника
+      description: Изменяет роль участника в сообществе
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: community_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "f6g7h8i9-j0k1-2345-fghi-678901234567"
+        - in: path
+          name: user_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum: ["member", "admin", "owner"]
+                  example: "admin"
+      responses:
+        "204":
+          description: Роль изменена
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Нет прав для изменения роли
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Сообщество или пользователь не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/communities/{name}:
+    get:
+      summary: Получить сообщество по имени
+      description: Возвращает информацию о сообществе по имени
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          example: "techlovers"
+      responses:
+        "200":
+          description: Информация о сообществе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.CommunityForm'
+        "404":
+          description: Сообщество не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/communities/{name}/posts:
+    get:
+      summary: Получить посты сообщества
+      description: Возвращает посты сообщества
+      tags:
+        - Communities
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          example: "techlovers"
+        - in: query
+          name: count
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+          example: "2023-10-01T12:00:00Z"
+      responses:
+        "200":
+          description: Список постов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.PostOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "404":
+          description: Сообщество не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+    post:
+      summary: Создать пост сообщества
+      description: Создает новый пост сообщества
+      tags:
+        - Communities
+      security:
+        - SessionAuth: [ ]
+      parameters:
+        - in: path
+          name: name
+          required: true
+          schema:
+            type: string
+          example: "techlovers"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forms.CommentForm'
+      responses:
+        "201":
+          description: Пост создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.PostOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/chats:
+    get:
+      summary: Получить чаты пользователя
+      description: Возвращает список чатов пользователя
+      tags:
+        - Chats
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: query
+          name: count
+          required: true
+          schema:
+            type: integer
+          example: 10
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+          example: "2023-10-01T12:00:00Z"
+        - in: query
+          name: unread
+          schema:
+            type: boolean
+          example: true
+      responses:
+        "200":
+          description: Список чатов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.ChatOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/chats/{chat_id}/messages:
+    get:
+      summary: Получить сообщения чата
+      description: Возвращает сообщения для указанного чата
+      tags:
+        - Messages
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: chat_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - in: query
+          name: count
+          required: true
+          schema:
+            type: integer
+          example: 20
+        - in: query
+          name: ts
+          schema:
+            type: string
+            format: date-time
+          example: "2023-10-01T12:00:00Z"
+      responses:
+        "200":
+          description: Список сообщений
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.MessageOut'
+        "400":
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "403":
+          description: Нет доступа к чату
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+#  /api/v2/chats/{chat_id}/messages/{message_id}:
+#    delete:
+#      summary: Удалить сообщение
+#      description: Удаляет сообщение из чата
+#      tags:
+#        - Messages
+#      security:
+#        - SessionAuth: []
+#      parameters:
+#        - in: path
+#          name: chat_id
+#          required: true
+#          schema:
+#            type: string
+#            format: uuid
+#          example: "550e8400-e29b-41d4-a716-446655440000"
+#        - in: path
+#          name: message_id
+#          required: true
+#          schema:
+#            type: string
+#            format: uuid
+#          example: "660e8400-e29b-41d4-a716-446655440000"
+#      responses:
+#        "204":
+#          description: Сообщение удалено
+#        "400":
+#          description: Некорректные данные
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "403":
+#          description: Нет доступа к сообщению
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "404":
+#          description: Сообщение не найдено
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+#        "500":
+#          description: Ошибка сервера
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/health:
+    get:
+      summary: Проверить здоровье API
+      description: Проверяет доступность API
+      tags:
+        - Misc
+      responses:
+        "200":
+          description: API доступно
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "OK"
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+
+  /api/v2/files:
+    post:
+      summary: Загрузить файлы
+      description: Загружает один или несколько файлов разных типов (media, audio, files).
+      tags:
+        - Files
+      security:
+        - SessionAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                media:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                audio:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        "201":
+          description: Файлы успешно загружены
+          content:
+            application/json:
+              schema:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        media:
+                          type: array
+                          items:
+                            type: string
+                            format: url
+                        files:
+                          type: array
+                          items:
+                            type: string
+                            format: url
+                        audio:
+                          type: array
+                          items:
+                            type: string
+                            format: url
+        "400":
+          description: Ошибка загрузки или неверные данные
+        "401":
+          description: Не авторизован
+        "500":
+          description: Ошибка сервера
+
+
+  /api/v2/ws:
+    get:
+      summary: WebSocket соединение
+      description: Устанавливает WebSocket соединение для обмена сообщениями в реальном времени
+      tags:
+        - WebSocket
+      security:
+        - SessionAuth: []
+      responses:
+        "101":
+          description: Switching Protocols
+        "400":
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "401":
+          description: Не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'

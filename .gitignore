@@ -1,5 +1,5 @@
-.DS_Store
 .idea
 *.out
-*.exe
-out
+.DS_Store
+allure-report
+allure-results

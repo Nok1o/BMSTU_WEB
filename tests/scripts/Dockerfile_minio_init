@@ -1,0 +1,14 @@
+# Dockerfile-minio-init
+FROM alpine:3.20
+
+# Устанавливаем bash и curl
+RUN apk add --no-cache bash curl
+
+# Скачиваем minio client
+RUN wget https://dl.min.io/client/mc/release/linux-amd64/mc -O /usr/bin/mc && chmod +x /usr/bin/mc
+
+# Копируем скрипт
+COPY setup-minio-buckets.sh /setup-minio-buckets.sh
+RUN chmod +x /setup-minio-buckets.sh
+
+CMD ["/setup-minio-buckets.sh"]

@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+package chat_service;
+option go_package = "quickflow/messenger_service/internal/delivery/grpc/proto";
+
+import "google/protobuf/timestamp.proto";
+import "file_service/file_service.proto";
+
+
+message StickerPack {
+  string id = 1;
+  string name = 2;
+  repeated file_service.File stickers = 3;
+  string creator_id = 4;
+  google.protobuf.Timestamp created_at = 5;
+  google.protobuf.Timestamp updated_at = 6;
+}
+
+message AddStickerPackRequest {
+  StickerPack sticker_pack = 1;
+}
+
+message AddStickerPackResponse {
+  StickerPack sticker_pack = 1;
+}
+
+message GetStickerPackRequest {
+  string id = 1;
+}
+
+message GetStickerPackResponse {
+  StickerPack sticker_pack = 1;
+}
+
+message DeleteStickerPackRequest {
+  string pack_id = 1;
+  string user_id = 2;
+}
+
+message DeleteStickerPackResponse {
+  bool success = 1;
+}
+
+message GetStickerPacksRequest {
+  string user_id = 1;
+  int32 count = 2;
+  int32 offset = 3;
+}
+
+message GetStickerPacksResponse {
+  repeated StickerPack sticker_packs = 1;
+}
+
+message GetStickerPackByNameRequest {
+  string name = 1;
+}
+
+message GetStickerPackByNameResponse {
+  StickerPack sticker_pack = 1;
+}
+
+service StickerService {
+  rpc AddStickerPack(AddStickerPackRequest) returns (AddStickerPackResponse);
+  rpc GetStickerPack(GetStickerPackRequest) returns (GetStickerPackResponse);
+  rpc DeleteStickerPack(DeleteStickerPackRequest) returns (DeleteStickerPackResponse);
+  rpc GetStickerPacks(GetStickerPacksRequest) returns (GetStickerPacksResponse);
+  rpc GetStickerPackByName(GetStickerPackByNameRequest) returns (GetStickerPackByNameResponse);
+}

@@ -1,0 +1,255 @@
+name: Test
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  #  lint:
+  #    runs-on: ubuntu-latest
+  #    defaults:
+  #      run:
+  #        working-directory: backend
+  #
+  #    steps:
+  #      - uses: actions/checkout@v4
+  #
+  #      - uses: actions/setup-go@v4
+  #        with:
+  #          go-version: '1.24'
+  #
+  #      - name: Prepare dependencies
+  #        run: go mod tidy
+  #
+  #      - name: Run golangci-lint
+  #        uses: golangci/golangci-lint-action@v7
+  #        with:
+  #          version: v2.1.2
+  #          working-directory: backend
+
+
+  test-community-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Set up Docker Buildx
+        if: ${{ !env.ACT }}
+        uses: docker/setup-buildx-action@v2
+      - name: Build test container
+        run: docker build -f ./community_service/Dockerfile_test -t community-test .
+
+      - name: Run tests in container
+        run: docker run community-test
+
+  test-feedback-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build test container
+        run: docker build -f ./feedback_service/Dockerfile_test -t feedback-test .
+
+      - name: Run tests in container
+        run: docker run feedback-test
+
+  test-file-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build test container
+        run: docker build -f ./file_service/Dockerfile_test -t file-test .
+
+      - name: Run tests in container
+        run: docker run file-test
+
+  test-friends-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build test container
+        run: docker build -f ./friends_service/Dockerfile_test -t friends-test .
+
+      - name: Run tests in container
+        run: docker run friends-test
+
+  test-messenger-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build test container
+        run: docker build -f ./messenger_service/Dockerfile_test -t messenger-test .
+
+      - name: Run tests in container
+        run: docker run messenger-test
+
+  test-post-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build test container
+        run: docker build -f ./post_service/Dockerfile_test -t post-test .
+
+      - name: Run tests in container
+        run: docker run post-test
+
+  test-user-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.24'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Build test container
+        run: docker build -f ./user_service/Dockerfile_test -t user-test .
+
+      - name: Run tests in container
+        run: docker run user-test
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        run: docker compose -f tests/docker-compose.yml build
+
+      - name: Start dependencies
+        run: docker compose -f tests/docker-compose.yml up -d postgres redis minio
+
+      - name: Wait for services to be healthy
+        run: docker compose -f tests/docker-compose.yml ps
+
+      - name: Init MinIO buckets
+        run: docker compose -f tests/docker-compose.yml run --rm minio-init
+
+      - name: Run integration tests
+        run: docker compose -f tests/docker-compose.yml up --exit-code-from integration-test integration-test
+
+      - name: Shut down
+        if: failure()
+        run: docker compose -f tests/docker-compose.yml down -v
+
+    needs: [test-community-service, test-feedback-service, test-file-service, test-friends-service, test-messenger-service, test-post-service, test-user-service]
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      #      - name: Set up Docker Compose
+      #        run: docker compose -f tests/docker-compose.yml build
+
+      - name: Start dependencies
+        run: docker compose -f tests/docker-compose.yml up -d postgres redis minio
+
+      - name: Wait for services to be healthy
+        run: docker compose -f tests/docker-compose.yml ps
+
+      - name: Init MinIO buckets
+        run: docker compose -f tests/docker-compose.yml run --rm minio-init
+
+      - name: Raise gateway
+        run: docker compose -f tests/docker-compose.yml up -d gateway
+
+      - name: Run e2e tests
+        run: docker compose -f tests/docker-compose.yml up --exit-code-from e2e-test e2e-test
+
+      - name: Shut down
+        if: always()
+        run: docker compose -f tests/docker-compose.yml down -v
+
+    needs: [ integration-tests ]
+
+
+#  deploy:
+#    runs-on: ubuntu-latest
+#    needs: lint
+#    steps:
+#      - name: rebuild docker-compose
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.HOST }}
+#          username: ${{ secrets.USERNAME }}
+#          key: ${{ secrets.SSH_KEY }}
+#          script: |
+#            cd quickflow_backend/
+#            git pull
+#            make up

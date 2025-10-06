@@ -1,0 +1,17 @@
+FROM golang:1.24 AS tester
+
+WORKDIR /app
+
+# Копируем модули и скачиваем зависимости
+COPY backend/go.mod backend/go.sum ./
+COPY ./deploy/config /config
+RUN go mod download
+
+# Копируем весь проект
+COPY backend .
+
+ENV RUNNING_IN_CONTAINER=true
+ENV ALLURE_OUTPUT_PATH="/app"
+
+# Запуск интеграционных тестов
+CMD ["go", "test", "-p", "1", "-tags", "unit", "-v", "./..."]

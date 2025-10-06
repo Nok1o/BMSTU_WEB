@@ -1,0 +1,333 @@
+services:
+  gateway:
+    build:
+      context: ../backend
+      dockerfile: gateway/Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"  # HTTP Gateway порт
+    volumes:
+      - ../deploy/config:/config
+    depends_on:
+      post_service:
+        condition: service_started
+      user_service:
+        condition: service_started
+      file_service:
+        condition: service_started
+      messenger_service:
+        condition: service_started
+      community_service:
+        condition: service_started
+      feedback_service:
+        condition: service_started
+      friends_service:
+        condition: service_started
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_started
+    restart: always
+    environment:
+      RUNNING_IN_CONTAINER: true
+    env_file:
+      - .env
+    networks:
+      - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/hello || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  file_service:
+    build:
+      context: ../backend
+      dockerfile: file_service/Dockerfile
+    container_name: file_service
+    volumes:
+      - ../deploy/config:/config
+      - ./allure-results:/app/allure-results
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    restart: always
+    environment:
+      RUNNING_IN_CONTAINER: true
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  post_service:
+    build:
+      context: ../backend
+      dockerfile: post_service/Dockerfile
+    container_name: post_service
+    volumes:
+      - ../deploy/config:/config
+      - ./allure-results:/app/allure-results
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  user_service:
+    build:
+      context: ../backend
+      dockerfile: user_service/Dockerfile
+    container_name: user_service
+    volumes:
+      - ../deploy/config:/config
+      - ./allure-results:/app/allure-results
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  messenger_service:
+    build:
+      context: ../backend
+      dockerfile: messenger_service/Dockerfile
+    container_name: messenger_service
+    volumes:
+      - ../deploy/config:/config
+      - ./allure-results:/app/allure-results
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  feedback_service:
+    build:
+      context: ../backend
+      dockerfile: feedback_service/Dockerfile
+    container_name: feedback_service
+    volumes:
+      - ../deploy/config:/config
+      - ./allure-results:/app/allure-results
+    ports:
+      - "8085:8085"
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  friends_service:
+    build:
+      context: ../backend
+      dockerfile: ../backend/friends_service/Dockerfile
+    container_name: friends_service
+    volumes:
+      - ./allure-results:/app/allure-results
+      - ../deploy/config:/config
+    ports:
+      - "8086:8086"
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  community_service:
+    build:
+      context: ../backend
+      dockerfile: community_service/Dockerfile
+    container_name: community_service
+    volumes:
+      - ../deploy/config:/config
+      - ./allure-results:/app/allure-results
+    ports:
+      - "8087:8087"
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+      minio:
+        condition: service_healthy
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: quickflow_admin
+      POSTGRES_PASSWORD: SuperSecurePassword1
+      POSTGRES_DB: quickflow_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../deploy/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U quickflow_admin -d quickflow_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - integration-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ../deploy/config/redis/:/etc/redis/
+    command: [ "redis-server", "/etc/redis/redis.conf" ]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - integration-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: always
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_MODE: production
+      MINIO_DATA_DIR: /data
+      MINIO_CONFIG_DIR: /root/.minio
+    volumes:
+      - minio_data:/data
+      - minio_config:/root/.minio
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    env_file:
+      - .env
+    networks:
+      - integration-network
+
+  minio-init:
+    build:
+      context: scripts
+      dockerfile: Dockerfile_minio_init
+    depends_on:
+      minio:
+        condition: service_healthy
+    networks:
+      - integration-network
+    profiles: ["init"]
+    volumes:
+      - .env:/etc/environment:ro
+
+  unit-test:
+    build:
+        context: ../
+        dockerfile: tests/docker/unit.Dockerfile
+    container_name: unit-test
+    volumes:
+      - ./allure-results:/app/allure-results
+
+
+  integration-test:
+    build:
+      context: ../
+      dockerfile: backend/Dockerfile_int_test
+    container_name: integration-test
+    depends_on:
+      gateway:
+        condition: service_started
+    environment:
+      DATABASE_TEST_URL: "postgresql://quickflow_admin:SuperSecurePassword1@postgres:5432/quickflow_db"
+      REDIS_URL: "redis:6379"
+      REDIS_PASS: "22848Amogus"
+      MINIO_TEST_URL: "http://minio:9000"
+    networks:
+      - integration-network
+    volumes:
+      - ./allure-results:/app/allure-results
+
+  e2e-test:
+    build:
+      context: ./e2e
+      dockerfile: ../docker/e2e_test.Dockerfile
+    container_name: e2e-test
+    depends_on:
+      gateway:
+        condition: service_started
+    networks:
+      - integration-network
+    volumes:
+      - ./allure-results:/app/allure-results
+
+
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  minio_config:
+  allure-results:
+
+
+networks:
+  integration-network:
+    driver: bridge

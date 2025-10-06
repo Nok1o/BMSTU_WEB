@@ -1,0 +1,16 @@
+
+max_post_pictures_count = 10
+max_message_pictures_count = 10
+allowed_img_ext = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "tiff", "svg", "ico"]
+max_post_pictures_size = "5MB"
+max_message_pictures_size = "5MB"
+max_post_text_length = 4000
+max_message_text_length = 4000
+
+max_picture_count = 10
+max_picture_size = "5MB"
+
+community_name_min_length = 3
+community_name_max_length = 50
+community_description_max_length = 500
+community_avatar_max_size = "5MB"
