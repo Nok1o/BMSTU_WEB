@@ -48,13 +48,13 @@ func (s *UserServiceServer) SignUp(ctx context.Context, req *pb.SignUpRequest) (
 		return nil, fmt.Errorf("invalid profile data: %w", err)
 	}
 
-	_, session, err := s.authUseCase.CreateUser(ctx, *user, *profile)
+	userId, session, err := s.authUseCase.CreateUser(ctx, *user, *profile)
 	if err != nil {
 		logger.Error(ctx, "failed to create user : %v", err)
 		return nil, err
 	}
 
-	return &pb.SignUpResponse{Session: dto.MapSessionToDTO(session)}, nil
+	return &pb.SignUpResponse{Session: dto.MapSessionToDTO(session), UserId: userId.String()}, nil
 }
 
 func (s *UserServiceServer) SignIn(ctx context.Context, req *pb.SignInRequest) (*pb.SignInResponse, error) {

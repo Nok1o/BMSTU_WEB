@@ -164,3 +164,19 @@ func (c *CommentClient) GetLastPostComment(ctx context.Context, postId uuid.UUID
 
 	return ProtoCommentToModel(resp.Comment)
 }
+
+func (c *CommentClient) GetCommentLikes(ctx context.Context, postId uuid.UUID, postCount, offset int) ([]models.Like, error) {
+	req := &pb.GetLikesRequest{
+		CommentId: postId.String(),
+		Count:     int32(postCount),
+		Offset:    int32(offset),
+	}
+
+	resp, err := c.client.GetCommentLikes(ctx, req)
+	if err != nil {
+		logger.Error(ctx, "Failed to get last comment likes: %v", err)
+		return nil, err
+	}
+
+	return ProtoLikesToModel(resp.Likes)
+}

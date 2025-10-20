@@ -295,6 +295,10 @@ components:
           format: uuid
           example: "550e8400-e29b-41d4-a716-446655440001"
           description: ID пользователя, ставящего лайк
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-02-20T14:30:00Z"
 
     forms.ErrorForm:
       type: object
@@ -647,9 +651,9 @@ components:
           example: "1990-01-01"
         sex:
           type: integer
-          enum: [1, 2]
+          enum: [0, 1]
           example: 1
-          description: "1 - мужской, 2 - женский"
+          description: "0 - мужской, 1 - женский"
 
     forms.UniversityEducationForm:
       type: object
@@ -782,7 +786,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/forms.ErrorForm'
-        "401":
+        "404":
           description: Неверные учетные данные
           content:
             application/json:
@@ -1049,6 +1053,8 @@ paths:
               type: string
               enum: ["outcoming", "incoming", "friend"]
               default: "friend"
+      security:
+        - SessionAuth: []
       responses:
         "200":
           description: Список друзей
@@ -1609,45 +1615,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/forms.ErrorForm'
-#    get:
-#      summary: Получить список лайков поста
-#      description: Возвращает список лайков для поста
-#      tags:
-#        - Likes
-#      security:
-#        - SessionAuth: []
-#      parameters:
-#        - in: query
-#          name: offset
-#          schema:
-#            type: int
-#            default: 0
-#        - in: query
-#          name: count
-#          schema:
-#            type: int
-#            default: 10
-#      responses:
-#        "200":
-#          description: Список лайков
-#          content:
-#            application/json:
-#              schema:
-#                type: array
-#                items:
-#                  $ref: '#/components/schemas/forms.LikeForm'
-#        "400":
-#          description: Некорректные параметры
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/forms.ErrorForm'
-#        "500":
-#          description: Ошибка сервера
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/forms.ErrorForm'
+    get:
+      summary: Получить список лайков поста
+      description: Возвращает список лайков для поста
+      tags:
+        - Likes
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - in: query
+          name: offset
+          schema:
+            type: int
+            default: 0
+        - in: query
+          name: count
+          schema:
+            type: int
+            default: 10
+      responses:
+        "200":
+          description: Список лайков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.LikeForm'
+        "400":
+          description: Некорректные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
 
   /api/v2/posts/{post_id}/comments/{comment_id}/likes:
     post:
@@ -1709,45 +1722,52 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/forms.ErrorForm'
-#    get:
-#      summary: Получить список лайков комментария
-#      description: Возвращает список лайков для комментария
-#      tags:
-#        - Likes
-#      security:
-#        - SessionAuth: []
-#      parameters:
-#        - in: query
-#          name: offset
-#          schema:
-#            type: int
-#            default: 0
-#        - in: query
-#          name: count
-#          schema:
-#            type: int
-#            default: 10
-#      responses:
-#        "200":
-#          description: Список лайков
-#          content:
-#            application/json:
-#              schema:
-#                type: array
-#                items:
-#                  $ref: '#/components/schemas/forms.LikeForm'
-#        "400":
-#          description: Некорректные параметры
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/forms.ErrorForm'
-#        "500":
-#          description: Ошибка сервера
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/forms.ErrorForm'
+    get:
+      summary: Получить список лайков комментария
+      description: Возвращает список лайков для комментария
+      tags:
+        - Likes
+      security:
+        - SessionAuth: []
+      parameters:
+        - in: path
+          name: post_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - in: query
+          name: offset
+          schema:
+            type: int
+            default: 0
+        - in: query
+          name: count
+          schema:
+            type: int
+            default: 10
+      responses:
+        "200":
+          description: Список лайков
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/forms.LikeForm'
+        "400":
+          description: Некорректные параметры
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
+        "500":
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/forms.ErrorForm'
 
 
 

@@ -30,6 +30,7 @@ message SignUpRequest {
 }
 
 message SignUpResponse {
+  string user_id = 2;
   Session session = 1;
 }
 

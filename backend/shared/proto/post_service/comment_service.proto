@@ -123,6 +123,23 @@ message GetLastPostCommentResponse {
   Comment comment = 1;
 }
 
+message GetLikesRequest {
+  string commentId = 1;
+  int32 count = 3;
+  int32 offset = 4;
+}
+
+message LikeComment{
+  string user_id = 1;
+  string target_id = 2;
+  string target_type = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+message GetLikesResponse {
+  repeated LikeComment likes = 1;
+}
+
 // CommentService defines the gRPC service for handling comments.
 service CommentService {
   rpc AddComment(AddCommentRequest) returns (AddCommentResponse);
@@ -134,4 +151,5 @@ service CommentService {
   rpc GetComment(GetCommentRequest) returns (GetCommentResponse);
   rpc GetCommentFiles(GetCommentFilesRequest) returns (GetCommentFilesResponse);
   rpc GetLastPostComment(GetLastPostCommentRequest) returns (GetLastPostCommentResponse);
+  rpc GetCommentLikes(GetLikesRequest) returns (GetLikesResponse);
 }

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package file_service;
+package post_service;
 option go_package = "quickflow/post_service/internal/delivery/grpc/proto";
 
 import "google/protobuf/timestamp.proto";
@@ -11,7 +11,7 @@ message Post {
   string creator_id = 2;
   string creator_type = 12;
   string description = 3;
-  repeated File files = 5;
+  repeated file_service.File files = 5;
   google.protobuf.Timestamp created_at = 6;
   google.protobuf.Timestamp updated_at = 7;
   int64 like_count = 8;
@@ -21,10 +21,17 @@ message Post {
   bool is_liked = 13;
 }
 
+message LikePost{
+  string user_id = 1;
+  string target_id = 2;
+  string target_type = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
 message PostUpdate {
   string id = 1;
   string description = 2;
-  repeated File files = 3;
+  repeated file_service.File files = 3;
 }
 
 message AddPostRequest {
@@ -111,6 +118,16 @@ message GetPostResponse {
   Post post = 1;
 }
 
+message GetPostLikesRequest {
+  string postId = 1;
+  int32 count = 3;
+  int32 offset = 4;
+}
+
+message GetPostLikesResponse {
+  repeated LikePost likes = 1;
+}
+
 service PostService {
   rpc AddPost(AddPostRequest) returns (AddPostResponse);
   rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
@@ -121,4 +138,5 @@ service PostService {
   rpc LikePost(LikePostRequest) returns (LikePostResponse);
   rpc UnlikePost(UnlikePostRequest) returns (UnlikePostResponse);
   rpc GetPost(GetPostRequest) returns (GetPostResponse);
+  rpc GetPostLikes(GetPostLikesRequest) returns (GetPostLikesResponse);
 }

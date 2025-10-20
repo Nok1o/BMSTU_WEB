@@ -38,6 +38,8 @@ func NewProfileHandler(profileUC interfaces.ProfileUseCase, friendUseCase interf
 	}
 }
 
+const MultipartFormMaxSize = 15 << 20
+
 // GetProfile returns user profile
 // @Summary Get user profile
 // @Description Get user profile by id
@@ -146,7 +148,7 @@ func (p *ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	logger.Info(ctx, "User %s requested to update profile", user.Username)
 
 	var profileForm forms.ProfileForm
-	err := r.ParseMultipartForm(15 << 20) // 10 MB
+	err := r.ParseMultipartForm(MultipartFormMaxSize)
 	if err != nil {
 		logger.Error(ctx, "Failed to parse form: %s", err.Error())
 		http2.WriteJSONError(w, errors2.New(errors2.BadRequestErrorCode, fmt.Sprintf("Failed to parse form: %v", err), http.StatusBadRequest))
@@ -215,48 +217,6 @@ func (p *ProfileHandler) UpdateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	profileForm.ProfileInfo = &profileInfo
-
-	//err = json.NewDecoder(strings.NewReader(r.FormValue("profile"))).Decode(&profileInfo)
-	//if err == nil {
-	//	profileForm.ProfileInfo = &profileInfo
-	//	recievedValidInfo = true
-	//}
-	//
-	//sanitizer.SanitizeProfileInfo(&profileInfo, p.policy)
-	//
-	//// getting additional info
-	//var contactInfo forms.ContactInfo
-	//err = json.NewDecoder(strings.NewReader(r.FormValue("contact_info"))).Decode(&contactInfo)
-	//if err == nil {
-	//	profileForm.ContactInfo = &contactInfo
-	//	recievedValidInfo = true
-	//}
-	//
-	//sanitizer.SanitizeContactInfo(&contactInfo, p.policy)
-	//
-	//var schoolEducation forms.SchoolEducationForm
-	//err = json.NewDecoder(strings.NewReader(r.FormValue("school"))).Decode(&schoolEducation)
-	//if err == nil {
-	//	profileForm.SchoolEducation = &schoolEducation
-	//	recievedValidInfo = true
-	//}
-	//
-	//sanitizer.SanitizeSchoolInfo(&schoolEducation, p.policy)
-	//
-	//var universityEducation forms.UniversityEducationForm
-	//err = json.NewDecoder(strings.NewReader(r.FormValue("university"))).Decode(&universityEducation)
-	//if err == nil {
-	//	profileForm.UniversityEducation = &universityEducation
-	//	recievedValidInfo = true
-	//}
-	//
-	//sanitizer.SanitizeUniversityInfo(&universityEducation, p.policy)
-	//
-	//if !recievedValidInfo {
-	//	logger.Error(ctx, "No valid data provided")
-	//	http2.WriteJSONError(w, errors2.New(errors2.BadRequestErrorCode, "No valid data provided", http.StatusBadRequest))
-	//	return
-	//}
 
 	// converting form to model
 	profile, err := profileForm.FormToModel()

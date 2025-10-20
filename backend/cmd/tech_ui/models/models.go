@@ -130,9 +130,10 @@ type CommentOut struct {
 
 // Likes
 type LikeForm struct {
-	TargetID   string `json:"target_id"`
-	TargetType string `json:"target_type"`
-	UserID     string `json:"user_id"`
+	TargetID   string            `json:"target_id"`
+	TargetType string            `json:"target_type"`
+	User       PublicUserInfoOut `json:"user"`
+	CreatedAt  string            `json:"created_at"`
 }
 
 // Communities

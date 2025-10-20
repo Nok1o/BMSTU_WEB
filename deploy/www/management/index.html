@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Управляющая панель QuickFlow</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            background: #2c3e50;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.12);
+        }
+        .card-header {
+            padding: 20px;
+            background: #3498db;
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        .card-body {
+            padding: 25px;
+        }
+        .card ul {
+            list-style-type: none;
+        }
+        .card li {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .card li:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        .btn {
+            display: block;
+            padding: 12px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            text-align: center;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            margin-top: 15px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        .btn-api { background: #9b59b6; }
+        .btn-api:hover { background: #8e44ad; }
+        .btn-legacy { background: #e67e22; }
+        .btn-legacy:hover { background: #d35400; }
+        .btn-docs { background: #27ae60; }
+        .btn-docs:hover { background: #219653; }
+        .btn-home { background: #3498db; }
+        .btn-home:hover { background: #2980b9; }
+        .btn-admin { background: #d35400; }
+        .btn-admin:hover { background: #b03a00; }
+        .btn-status { background: #7f8c8d; }
+        .btn-status:hover { background: #6c7a7d; }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .back-btn:hover {
+            background: #1a252f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Управляющая панель QuickFlow</h1>
+            <p class="subtitle">Централизованный доступ ко всем системным разделам</p>
+        </header>
+        
+        <div class="dashboard">
+            <!-- API Documentation -->
+            <div class="card">
+                <div class="card-header">API Документация</div>
+                <div class="card-body">
+                    <p>Swagger-документация системы</p>
+                    <a href="/api/v2" class="btn btn-api">API v2</a>
+                </div>
+            </div>
+            
+            <!-- Legacy System -->
+            <div class="card">
+                <div class="card-header">Legacy Версии</div>
+                <div class="card-body">
+                    <p>Технический UI</p>
+                    <a href="/legacy" class="btn btn-legacy">Перейти к Legacy</a>
+                </div>
+            </div>
+            
+            <!-- Documentation -->
+            <div class="card">
+                <div class="card-header">Документация</div>
+                <div class="card-body">
+                    <p>Проектная документация системы</p>
+                    <a href="/docs/README.md" class="btn btn-docs">Читать документацию</a>
+                </div>
+            </div>
+            
+            <!-- Main Page -->
+            <div class="card">
+                <div class="card-header">Главная страница</div>
+                <div class="card-body">
+                    <p>Приветственный экран приложения</p>
+                    <a href="/" class="btn btn-home">Перейти на главную</a>
+                </div>
+            </div>
+            
+            <!-- Admin Panel -->
+            <div class="card">
+                <div class="card-header">Администрирование</div>
+                <div class="card-body">
+                    <p>Управление базой данных через pgAdmin</p>
+                    <a href="//pgadmin.localhost/" class="btn btn-admin">Открыть pgAdmin</a>
+                </div>
+            </div>
+            
+            <!-- Server Status -->
+            <div class="card">
+                <div class="card-header">Мониторинг</div>
+                <div class="card-body">
+                    <p>Статус сервера</p>
+                    <a href="/status" class="btn btn-status">Просмотр статуса</a>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Система управления QuickFlow | Лабораторная работа по проектированию</p>
+        </footer>
+    </div>
+</body>
+</html>
+

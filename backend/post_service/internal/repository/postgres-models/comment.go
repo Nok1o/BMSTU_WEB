@@ -106,3 +106,19 @@ func (c *CommentPostgres) ToComment() models.Comment {
 		IsLiked:   c.IsLiked.Bool,
 	}
 }
+
+type LikePostgres struct {
+	TargetType pgtype.Text
+	TargetId   pgtype.UUID
+	UserId     pgtype.UUID
+	CreatedAt  pgtype.Timestamptz
+}
+
+func (l *LikePostgres) ToModel() models.Like {
+	return models.Like{
+		TargetType: models.TargetType(l.TargetType.String),
+		TargetId:   l.TargetId.Bytes,
+		UserId:     l.UserId.Bytes,
+		CreatedAt:  l.CreatedAt.Time,
+	}
+}

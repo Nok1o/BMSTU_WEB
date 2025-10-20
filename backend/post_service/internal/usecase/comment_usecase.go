@@ -26,6 +26,7 @@ type CommentRepository interface {
 	UnlikeComment(ctx context.Context, commentId uuid.UUID, userId uuid.UUID) error
 	UpdateComment(ctx context.Context, commentUpdate models.CommentUpdate) error
 	GetLastPostComment(ctx context.Context, postId uuid.UUID) (*models.Comment, error)
+	GetCommentLikes(ctx context.Context, commentId uuid.UUID, numLikes, offset int) ([]models.Like, error)
 }
 
 type CommentUseCase struct {
@@ -235,4 +236,15 @@ func (c *CommentUseCase) GetLastPostComment(ctx context.Context, postId uuid.UUI
 		return nil, fmt.Errorf("p.fileService.GetComment: %w", err)
 	}
 	return Comment, err
+}
+
+func (c *CommentUseCase) GetCommentLikes(ctx context.Context, commentId uuid.UUID, numLikes, offset int) ([]models.Like, error) {
+	if commentId == uuid.Nil {
+		return nil, fmt.Errorf("commentId is empty")
+	}
+	likes, err := c.commentRepo.GetCommentLikes(ctx, commentId, numLikes, offset)
+	if err != nil {
+		return nil, fmt.Errorf("p.fileService.GetCommentLikes: %w", err)
+	}
+	return likes, nil
 }

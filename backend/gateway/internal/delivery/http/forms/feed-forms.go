@@ -82,11 +82,7 @@ func (p *PostForm) ToPostModel(userId uuid.UUID) (models.Post, error) {
 			return models.Post{}, errors.New("invalid creator type")
 		}
 
-		if postModel.CreatorType == models.PostCommunity {
-			postModel.CreatorId = p.CreatorId
-		} else {
-			postModel.CreatorId = userId
-		}
+		postModel.CreatorId = userId
 	}
 
 	postModel.Desc = p.Text
@@ -244,4 +240,20 @@ func (p *UpdatePostForm) ToPostUpdateModel(postId uuid.UUID) (models.PostUpdate,
 		Desc:  p.Text,
 		Files: attachments,
 	}, nil
+}
+
+type LikeOut struct {
+	TargetType string            `json:"target_type"`
+	TargetId   uuid.UUID         `json:"target_id"`
+	User       PublicUserInfoOut `json:"user"`
+	CreatedAt  string            `json:"created_at"`
+}
+
+func LikeFromModel(likeOut models.Like, user PublicUserInfoOut) LikeOut {
+	return LikeOut{
+		TargetType: string(likeOut.TargetType),
+		TargetId:   likeOut.UserId,
+		User:       user,
+		CreatedAt:  likeOut.CreatedAt.Format(time2.TimeStampLayout),
+	}
 }

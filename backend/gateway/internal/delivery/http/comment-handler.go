@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -171,7 +172,7 @@ func (c *CommentHandler) DeleteComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // UpdateComment обновляет комментарий
@@ -419,5 +420,64 @@ func (c *CommentHandler) UnlikeComment(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Возвращаем успех
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (p *CommentHandler) GetCommentLikes(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	commentIdStr := mux.Vars(r)["comment_id"]
+	commentId, err := uuid.Parse(commentIdStr)
+	if err != nil {
+		logger.Error(ctx, "Failed to parse post ID: %s", err.Error())
+		http2.WriteJSONError(w, errors2.New(errors2.BadRequestErrorCode, "Failed to parse post ID", http.StatusBadRequest))
+		return
+	}
+
+	numLikesStr := r.URL.Query().Get("count")
+	numLikes, err := strconv.Atoi(numLikesStr)
+	if err != nil || numLikes <= 0 {
+		numLikes = 10 // значение по умолчанию
+	}
+
+	offsetStr := r.URL.Query().Get("offset")
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil || offset < 0 {
+		offset = 0 // значение по умолчанию
+	}
+
+	logger.Info(ctx, "User requested likes for post %s, timestamp: %s, num_likes: %d, offset: %d", commentId.String(), numLikes, offset)
+
+	likes, err := p.commentUseCase.GetCommentLikes(ctx, commentId, numLikes, offset)
+	if err != nil {
+		logger.Error(ctx, "Failed to get post likes: %s", err.Error())
+		http2.WriteJSONError(w, err)
+		return
+	}
+
+	var likesOut []forms.LikeOut
+	for _, like := range likes {
+		userInfo, err := p.profileService.GetPublicUserInfo(ctx, like.UserId)
+		if err != nil {
+			logger.Error(ctx, "Failed to get user info for like: %s", err.Error())
+			http2.WriteJSONError(w, err)
+			return
+		}
+
+		likeOut := forms.LikeFromModel(like, forms.PublicUserInfoToOut(userInfo, ""))
+		likesOut = append(likesOut, likeOut)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	out := forms.PayloadWrapper[[]forms.LikeOut]{Payload: likesOut}
+	js, err := out.MarshalJSON()
+	if err != nil {
+		logger.Error(ctx, "Failed to marshal json payload %v", err)
+		http2.WriteJSONError(w, err)
+		return
+	}
+	if _, err = w.Write(js); err != nil {
+		logger.Error(ctx, "Failed to encode likes output %v", err)
+		http2.WriteJSONError(w, errors2.New(errors2.InternalErrorCode, "Failed to encode likes output", http.StatusInternalServerError))
+	}
 }

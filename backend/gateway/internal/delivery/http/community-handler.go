@@ -1,6 +1,7 @@
 package http
 
 import (
+	"bufio"
 	"encoding/json"
 	"net/http"
 	"strings"
@@ -353,6 +354,7 @@ func (c *CommunityHandler) DeleteCommunity(w http.ResponseWriter, r *http.Reques
 		return
 	}
 	logger.Info(ctx, "Successfully deleted community")
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (c *CommunityHandler) UpdateCommunity(w http.ResponseWriter, r *http.Request) {
@@ -605,7 +607,7 @@ func (c *CommunityHandler) ChangeUserRole(w http.ResponseWriter, r *http.Request
 	}
 	logger.Info(ctx, "User %s requested to change community role", user.Username)
 
-	communityIdStr := mux.Vars(r)["id"]
+	communityIdStr := mux.Vars(r)["community_id"]
 	if len(communityIdStr) == 0 {
 		http2.WriteJSONError(w, errors2.New(errors2.BadRequestErrorCode, "Community ID is required", http.StatusBadRequest))
 		return
@@ -632,7 +634,20 @@ func (c *CommunityHandler) ChangeUserRole(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	role := r.URL.Query().Get("role")
+	body := struct {
+		Role string `json:"role"`
+	}{}
+
+	err = json.NewDecoder(bufio.NewReader(r.Body)).Decode(&body)
+	if err != nil {
+		logger.Error(ctx, "Could not parse role from body: %v", err.Error())
+		http2.WriteJSONError(w, errors2.New(errors2.BadRequestErrorCode, "Invalid role", http.StatusBadRequest))
+		return
+	}
+	role := body.Role
+
+	logger.Info(ctx, "Got change role request, community_id = %s, user_id = %s", communityId, userId)
+
 	if len(role) == 0 {
 		logger.Error(ctx, "Role is required")
 		http2.WriteJSONError(w, errors2.New(errors2.BadRequestErrorCode, "Role is required", http.StatusBadRequest))
@@ -661,6 +676,7 @@ func (c *CommunityHandler) ChangeUserRole(w http.ResponseWriter, r *http.Request
 		return
 	}
 	logger.Info(ctx, "Successfully changed community role")
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (c *CommunityHandler) GetControlledCommunities(w http.ResponseWriter, r *http.Request) {

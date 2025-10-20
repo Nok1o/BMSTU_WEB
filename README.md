@@ -90,3 +90,7 @@ Storage: **PostgreSQL + Redis + Minio S3**.
 ![](./images/ComponentDiagram.svg)
 
 ## Экраны будущего WEB-приложения
+![](./images/Communities.svg)
+![](./images/Comments.svg)
+![](./images/Attachments.svg)
+![](./images/Friends.svg)

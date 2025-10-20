@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Добро пожаловать в QuickFlow!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .features {
+            margin-top: 40px;
+        }
+        .features ul {
+            columns: 2;
+            list-style-type: none;
+            padding: 0;
+        }
+        .features li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #27ae60;
+        }
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .gallery img {
+            width: 100%;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+    </style>
+    <link rel="stylesheet" href="/css/back-button.css">
+</head>
+<body>
+<div class="container">
+    <h1>Добро пожаловать в QuickFlow!</h1>
+    <p>Социальная платформа для общения, обмена мыслями и создания сообществ.</p>
+
+    <div class="features">
+        <h2>Основные возможности:</h2>
+        <ul>
+            <li>Создание и редактирование профиля</li>
+            <li>Авторизация в социальной сети с помощью логина и пароля</li>
+            <li>Добавление, изменение и удаление комментариев к постам</li>
+            <li>Просмотр постов своих друзей, а также тех, на кого пользователь подписан</li>
+            <li>Просмотр всех постов социальной сети</li>
+            <li>Добавление и удаление друзей</li>
+            <li>Написание и удаление сообщений в личной переписке</li>
+            <li>Создание, изменение, удаление сообществ</li>
+            <li>Отметка лайком понравившихся постов и комментариев</li>
+        </ul>
+    </div>
+
+    <h2>Экраны будущего WEB-приложения</h2>
+    <div class="gallery">
+        <img src="/img/Communities.svg" alt="Сообщества">
+        <img src="/img/Comments.svg" alt="Комментарии">
+        <img src="/img/Attachments.svg" alt="Вложения">
+        <img src="/img/Friends.svg" alt="Друзья">
+    </div>
+
+    <div class="back-btn-container">
+        <a href="/managment" class="back-btn">Панель управления</a>
+    </div>
+</div>
+</body>
+</html>

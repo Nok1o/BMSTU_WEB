@@ -23,3 +23,17 @@ type CommentUpdate struct {
 	Text  string
 	Files []*File
 }
+
+type TargetType string
+
+const (
+	TargetComment TargetType = "comment"
+	TargetPost    TargetType = "post"
+)
+
+type Like struct {
+	TargetType TargetType
+	TargetId   uuid.UUID
+	UserId     uuid.UUID
+	CreatedAt  time.Time
+}

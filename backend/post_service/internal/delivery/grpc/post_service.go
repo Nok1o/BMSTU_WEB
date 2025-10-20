@@ -23,6 +23,7 @@ type PostUseCase interface {
 	LikePost(ctx context.Context, postId uuid.UUID, userId uuid.UUID) error
 	UnlikePost(ctx context.Context, postId uuid.UUID, userId uuid.UUID) error
 	GetPost(ctx context.Context, postId uuid.UUID, userId uuid.UUID) (*models.Post, error)
+	GetPostLikes(ctx context.Context, postId uuid.UUID, numLikes, offset int) ([]models.Like, error)
 }
 
 type UserUseCase interface {
@@ -52,7 +53,7 @@ func (p *PostServiceServer) AddPost(ctx context.Context, req *pb.AddPostRequest)
 
 	result, err := p.postUseCase.AddPost(ctx, *post)
 	if err != nil {
-		logger.Error(ctx, "Failed to add post:: %v", err)
+		logger.Error(ctx, "Failed to add post: %v", err)
 		return nil, err
 	}
 
@@ -218,4 +219,26 @@ func (p *PostServiceServer) GetPost(ctx context.Context, req *pb.GetPostRequest)
 		return nil, err
 	}
 	return &pb.GetPostResponse{Post: dto.ModelPostToProto(post)}, nil
+}
+
+func (c *PostServiceServer) GetPostLikes(ctx context.Context, req *pb.GetPostLikesRequest) (*pb.GetPostLikesResponse, error) {
+	logger.Info(ctx, "GetCommentLikes called")
+	commentId, err := uuid.Parse(req.PostId)
+	if err != nil {
+		logger.Error(ctx, "Invalid comment ID:: %v", err)
+		return nil, err
+	}
+
+	numLikes := int(req.Count)
+	offset := int(req.Offset)
+
+	likes, err := c.postUseCase.GetPostLikes(ctx, commentId, numLikes, offset)
+	if err != nil {
+		logger.Error(ctx, "Failed to get comment likes:: %v", err)
+		return nil, err
+	}
+
+	protoLikes := dto.ModelLikePostToProto(likes)
+
+	return &pb.GetPostLikesResponse{Likes: protoLikes}, nil
 }

@@ -49,7 +49,7 @@ func main() {
 				Firstname: utils.ReadString("First name: "),
 				Lastname:  utils.ReadString("Last name: "),
 				BirthDate: utils.ReadDate("Birth date").Format(time.DateOnly),
-				Sex:       utils.ReadInt("Sex (1-male, 2-female): "),
+				Sex:       utils.ReadInt("Sex (0-male, 1-female): "),
 			}
 
 			resp, err := apiClient.SignUp(signUpForm)
@@ -58,7 +58,7 @@ func main() {
 				continue
 			}
 
-			fmt.Printf("Sign up successful! User ID: %s\n", resp.ID)
+			fmt.Printf("Sign up successful! userId: %s", resp.ID)
 			mainMenu(apiClient)
 
 		case 3:
@@ -452,9 +452,11 @@ func likesMenu(apiClient *client.APIClient) {
 		fmt.Println("2. Like Comment")
 		fmt.Println("3. Unlike Post")
 		fmt.Println("4. Unlike Comment")
-		fmt.Println("5. Back")
+		fmt.Println("5. View Post Likes")
+		fmt.Println("6. View Comment Likes")
+		fmt.Println("7. Back")
 
-		choice := utils.ReadInt("Enter choice (1-5): ")
+		choice := utils.ReadInt("Enter choice (1-7): ")
 
 		switch choice {
 		case 1:
@@ -505,6 +507,33 @@ func likesMenu(apiClient *client.APIClient) {
 			fmt.Println("Comment unliked successfully")
 
 		case 5:
+			postID := utils.ReadString("Post ID: ")
+
+			likes, err := apiClient.GetPostLikes(postID)
+			if err != nil {
+				fmt.Printf("Get post likes failed: %v\n", err)
+				continue
+			}
+
+			fmt.Printf("Found %d likes:\n", len(likes))
+			for _, like := range likes {
+				fmt.Printf("- User ID: %s at %s\n", like.User.ID, like.CreatedAt)
+			}
+		case 6:
+			postID := utils.ReadString("Post ID: ")
+			commentID := utils.ReadString("Comment ID: ")
+
+			likes, err := apiClient.GetCommentLikes(postID, commentID)
+			if err != nil {
+				fmt.Printf("Get comment likes failed: %v\n", err)
+				continue
+			}
+
+			fmt.Printf("Found %d likes:\n", len(likes))
+			for _, like := range likes {
+				fmt.Printf("- User ID: %s at %s\n", like.User.ID, like.CreatedAt)
+			}
+		case 7:
 			return
 		default:
 			fmt.Println("Invalid choice")
@@ -613,9 +642,10 @@ func communitiesMenu(apiClient *client.APIClient) {
 		fmt.Println("9. Get Community Members")
 		fmt.Println("10. Get Community Posts")
 		fmt.Println("11. Create Community Post")
-		fmt.Println("12. Back")
+		fmt.Println("12. Change Member Role")
+		fmt.Println("13. Back")
 
-		choice := utils.ReadInt("Enter choice (1-12): ")
+		choice := utils.ReadInt("Enter choice (1-13): ")
 
 		switch choice {
 		case 1:
@@ -630,7 +660,7 @@ func communitiesMenu(apiClient *client.APIClient) {
 
 			fmt.Printf("Found %d communities:\n", len(communities))
 			for _, community := range communities {
-				fmt.Printf("- %s (%s): %s\n", community.Community.Name, community.Community.Nickname, community.Community.Description)
+				fmt.Printf("- %s (%s:%s): %s\n", community.Community.Name, community.Community.Nickname, community.ID, community.Community.Description)
 			}
 
 		case 2:
@@ -646,7 +676,7 @@ func communitiesMenu(apiClient *client.APIClient) {
 
 			fmt.Printf("Found %d communities:\n", len(communities))
 			for _, community := range communities {
-				fmt.Printf("- %s (%s) [%s]\n", community.Community.Name, community.Community.Nickname, community.Role)
+				fmt.Printf("- %s (%s:%s) [%s]\n", community.Community.Name, community.Community.Nickname, community.ID, community.Role)
 			}
 
 		case 3:
@@ -769,6 +799,17 @@ func communitiesMenu(apiClient *client.APIClient) {
 			fmt.Printf("Community post created: %s\n", post.ID)
 
 		case 12:
+			communityID := utils.ReadString("Community ID: ")
+			userID := utils.ReadString("User ID: ")
+			role := utils.ReadString("New role (member/admin/owner): ")
+
+			err := apiClient.ChangeCommunityMemberRole(communityID, userID, role)
+			if err != nil {
+				fmt.Printf("Change role failed: %v\n", err)
+			} else {
+				fmt.Println("Member role changed successfully")
+			}
+		case 13:
 			return
 		default:
 			fmt.Println("Invalid choice")

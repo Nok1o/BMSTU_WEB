@@ -96,6 +96,14 @@ const unlikePostRequest = `
 	where post_id = $1 and user_id = $2;
 `
 
+const getPostLikesQuery = `
+	select user_id, post_id, created_at 
+	from like_post
+	where post_id = $1
+	limit $2
+	offset $3
+`
+
 type PostgresPostRepository struct {
 	connPool *sql.DB
 }
@@ -457,4 +465,32 @@ func (p *PostgresPostRepository) LikePost(ctx context.Context, postId uuid.UUID,
 	}
 
 	return nil
+}
+
+func (c *PostgresPostRepository) GetPostLikes(ctx context.Context, postId uuid.UUID, numLikes, offset int) ([]models.Like, error) {
+	rows, err := c.connPool.QueryContext(ctx, getPostLikesQuery, postId, numLikes, offset)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, post_errors.ErrNotFound
+	}
+	if err != nil {
+		logger.Error(ctx, "Unable to get comments from database for post %v, numComments %v, timestamp %v: %s", postId, numLikes, err.Error())
+		return nil, fmt.Errorf("unable to get like for post from database: %w", err)
+	}
+	defer rows.Close()
+
+	var result []models.Like
+	for rows.Next() {
+		var commentPostgres pgmodels.LikePostgres
+		err = rows.Scan(&commentPostgres.UserId, &commentPostgres.TargetId, &commentPostgres.CreatedAt)
+		if err != nil {
+			logger.Error(ctx, "Unable to scan like for post %v from database: %s", commentPostgres.TargetId, err.Error())
+			return nil, fmt.Errorf("unable to get like for post from database: %w", err)
+		}
+
+		model := commentPostgres.ToModel()
+		model.TargetType = models.TargetPost
+		result = append(result, model)
+	}
+
+	return result, nil
 }

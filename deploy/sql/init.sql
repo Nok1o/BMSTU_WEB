@@ -108,6 +108,7 @@ create table if not exists like_post(
                                         id int generated always as identity primary key,
                                         user_id uuid references "user"(id) on delete cascade,
                                         post_id uuid references post(id) on delete cascade,
+                                        created_at timestamptz not null default now(),
                                         unique (user_id, post_id)
 );
 
@@ -115,6 +116,7 @@ create table if not exists like_comment(
                                            id int generated always as identity primary key,
                                            user_id uuid references "user"(id) on delete cascade,
                                            comment_id uuid references comment(id) on delete cascade,
+                                           created_at timestamptz not null default now(),
                                            unique (user_id, comment_id)
 );
 

@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "QuickFlow DB",
+      "Group": "QuickFlow",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "quickflow_db",
+      "Username": "quickflow_admin",
+      "SSLMode": "prefer"
+    }
+  }
+}

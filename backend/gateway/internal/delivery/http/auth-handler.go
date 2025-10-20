@@ -134,6 +134,7 @@ func (a *AuthHandler) SignUp(w http.ResponseWriter, r *http.Request) {
 		Expires:  session.ExpireDate,
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	w.WriteHeader(http.StatusCreated)
@@ -209,6 +210,7 @@ func (a *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		Expires:  session.ExpireDate,
 		HttpOnly: true,
 		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
 	})
 
 	w.WriteHeader(http.StatusCreated)

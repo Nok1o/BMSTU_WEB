@@ -49,7 +49,7 @@ func (u *UserUseCase) CreateUser(ctx context.Context, user shared_models.User, p
 	var err error
 	// validation
 	if err = validation.ValidateUser(user.Username, user.Password); err != nil {
-		return uuid.Nil, shared_models.Session{}, fmt.Errorf("%w: validation.ValidateUser: %w", user_errors.ErrUserValidation, err)
+		return uuid.Nil, shared_models.Session{}, user_errors.ErrAlreadyExists
 	}
 
 	if profile.BasicInfo == nil {
@@ -104,7 +104,7 @@ func (u *UserUseCase) CreateUser(ctx context.Context, user shared_models.User, p
 func (u *UserUseCase) AuthUser(ctx context.Context, authData shared_models.LoginData) (shared_models.Session, error) {
 	user, err := u.userRepo.GetUser(ctx, authData)
 	if err != nil {
-		return shared_models.Session{}, fmt.Errorf("a.userRepo.GetUser: %w", err)
+		return shared_models.Session{}, user_errors.ErrNotFound
 	}
 
 	session := shared_models.CreateSession()

@@ -43,7 +43,13 @@ func (c *Client) CreateUser(ctx context.Context, user shared_models.User, profil
 		return uuid.Nil, shared_models.Session{}, err
 	}
 
-	return user.Id, shared_models.Session{
+	userId, err := uuid.Parse(resp.UserId)
+	if err != nil {
+		logger.Error(ctx, "Failed to parse user ID: %v", err)
+		return uuid.Nil, shared_models.Session{}, err
+	}
+
+	return userId, shared_models.Session{
 		SessionId:  sessionID,
 		ExpireDate: resp.Session.Expiry.AsTime(),
 	}, nil

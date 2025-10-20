@@ -1,6 +1,7 @@
 package post_service
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -126,6 +127,88 @@ func ProtoCommentToModel(c *pb.Comment) (*shared_models.Comment, error) {
 		LikeCount: int(c.LikeCount),
 		IsLiked:   c.IsLiked,
 	}, nil
+}
+
+func ProtoLikesToModel(likes []*pb.LikeComment) ([]shared_models.Like, error) {
+	result := make([]shared_models.Like, len(likes))
+	for i, like := range likes {
+		userId, err := uuid.Parse(like.UserId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse user ID for like: %v", err)
+		}
+
+		targetId, err := uuid.Parse(like.TargetId)
+		if err != nil {
+			return nil, fmt.Errorf("ailed to parse target ID for like: %v", err)
+		}
+
+		var targetType shared_models.TargetType
+		targetType = shared_models.TargetComment
+
+		createdAt := like.CreatedAt.AsTime()
+
+		result[i] = shared_models.Like{
+			TargetType: targetType,
+			TargetId:   targetId,
+			UserId:     userId,
+			CreatedAt:  createdAt,
+		}
+	}
+	return result, nil
+}
+
+func ModelLikeCommentToProto(likes []shared_models.Like) []*pb.LikeComment {
+	var res []*pb.LikeComment
+	for _, like := range likes {
+		res = append(res, &pb.LikeComment{
+			UserId:     like.UserId.String(),
+			TargetId:   like.TargetId.String(),
+			TargetType: string(shared_models.TargetComment),
+			CreatedAt:  timestamppb.New(like.CreatedAt),
+		})
+	}
+	return res
+}
+
+func ModelLikePostToProto(likes []shared_models.Like) []*pb.LikePost {
+	var res []*pb.LikePost
+	for _, like := range likes {
+		res = append(res, &pb.LikePost{
+			UserId:     like.UserId.String(),
+			TargetId:   like.TargetId.String(),
+			TargetType: string(shared_models.TargetComment),
+			CreatedAt:  timestamppb.New(like.CreatedAt),
+		})
+	}
+	return res
+}
+
+func ProtoPostLikesToModel(likes []*pb.LikePost) ([]shared_models.Like, error) {
+	result := make([]shared_models.Like, len(likes))
+	for i, like := range likes {
+		userId, err := uuid.Parse(like.UserId)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse user ID for like: %v", err)
+		}
+
+		targetId, err := uuid.Parse(like.TargetId)
+		if err != nil {
+			return nil, fmt.Errorf("ailed to parse target ID for like: %v", err)
+		}
+
+		var targetType shared_models.TargetType
+		targetType = shared_models.TargetPost
+
+		createdAt := like.CreatedAt.AsTime()
+
+		result[i] = shared_models.Like{
+			TargetType: targetType,
+			TargetId:   targetId,
+			UserId:     userId,
+			CreatedAt:  createdAt,
+		}
+	}
+	return result, nil
 }
 
 // ProtoCommentUpdateToModel converts proto.CommentUpdate to model.CommentUpdate

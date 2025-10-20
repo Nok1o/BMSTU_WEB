@@ -72,6 +72,14 @@ const getLastCommentQuery = `
 	limit 1;
 `
 
+const getCommentLikesQuery = `
+	select user_id, comment_id, created_at 
+	from like_comment
+	where comment_id = $1
+	limit $2
+	offset $3
+`
+
 type PostgresCommentRepository struct {
 	connPool *sql.DB
 }
@@ -80,6 +88,34 @@ func NewPostgresCommentRepository(connPool *sql.DB) *PostgresCommentRepository {
 	return &PostgresCommentRepository{
 		connPool: connPool,
 	}
+}
+
+func (c *PostgresCommentRepository) GetCommentLikes(ctx context.Context, commentId uuid.UUID, numLikes, offset int) ([]models.Like, error) {
+	rows, err := c.connPool.QueryContext(ctx, getCommentLikesQuery, commentId, numLikes, offset)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, post_errors.ErrNotFound
+	}
+	if err != nil {
+		logger.Error(ctx, "Unable to get comments from database for post %v, numComments %v, timestamp %v: %s", commentId, numLikes, err.Error())
+		return nil, fmt.Errorf("unable to get comments from database: %w", err)
+	}
+	defer rows.Close()
+
+	var result []models.Like
+	for rows.Next() {
+		var commentPostgres postgres_models.LikePostgres
+		err = rows.Scan(&commentPostgres.UserId, &commentPostgres.TargetId, &commentPostgres.CreatedAt)
+		if err != nil {
+			logger.Error(ctx, "Unable to scan like for comment %v from database: %s", commentPostgres.TargetId, err.Error())
+			return nil, fmt.Errorf("unable to get comments from database: %w", err)
+		}
+
+		model := commentPostgres.ToModel()
+		model.TargetType = models.TargetComment
+		result = append(result, model)
+	}
+
+	return result, nil
 }
 
 // AddComment adds a comment to the repository.

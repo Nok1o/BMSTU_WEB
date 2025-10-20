@@ -33,11 +33,13 @@ services:
         condition: service_started
       grafana:
         condition: service_started
-    restart: always
+    restart: unless-stopped
     environment:
       RUNNING_IN_CONTAINER: true
     env_file:
       - .env
+    networks:
+      - backend-network
 
   file_service:
     build:
@@ -55,11 +57,13 @@ services:
         condition: service_started
       minio:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
     environment:
       RUNNING_IN_CONTAINER: true
     env_file:
       - .env
+    networks:
+      - backend-network
 
   post_service:
     build:
@@ -77,9 +81,11 @@ services:
         condition: service_started
       minio:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
+    networks:
+      - backend-network
 
   user_service:
     build:
@@ -95,9 +101,11 @@ services:
         condition: service_started
       redis:
         condition: service_started
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
+    networks:
+      - backend-network
 
   messenger_service:
     build:
@@ -115,9 +123,11 @@ services:
         condition: service_started
       minio:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
+    networks:
+      - backend-network
 
   feedback_service:
     build:
@@ -135,9 +145,11 @@ services:
         condition: service_started
       minio:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
+    networks:
+      - backend-network
 
   friends_service:
     build:
@@ -153,9 +165,11 @@ services:
         condition: service_started
       redis:
         condition: service_started
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
+    networks:
+      - backend-network
 
   community_service:
     build:
@@ -173,14 +187,16 @@ services:
         condition: service_started
       minio:
         condition: service_healthy
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
+    networks:
+      - backend-network
 
   postgres:
     image: postgres:15
     container_name: postgres
-    restart: always
+    restart: unless-stopped
     environment:
       POSTGRES_USER: quickflow_admin
       POSTGRES_PASSWORD: SuperSecurePassword1
@@ -192,23 +208,32 @@ services:
       - ../deploy/sql:/docker-entrypoint-initdb.d
     env_file:
       - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U quickflow_admin -d quickflow_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend-network
 
   redis:
     image: redis:latest
     container_name: redis
-    restart: always
+    restart: unless-stopped
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
       - ./config/redis/redis.conf:/etc/redis/redis.conf
     command: [ "redis-server", "/etc/redis/redis.conf" ]
+    networks:
+      - backend-network
 
   # s3 хранилище minio
   minio:
     image: minio/minio:latest
     container_name: minio
-    restart: always
+    restart: unless-stopped
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -227,6 +252,8 @@ services:
     command: server /data --console-address ":9001"
     env_file:
       - .env
+    networks:
+      - backend-network
 
   prometheus:
     container_name: prometheus
@@ -235,6 +262,8 @@ services:
       - ../backend/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    networks:
+      - backend-network
 
   grafana:
     image: grafana/grafana:11.3.0
@@ -249,7 +278,9 @@ services:
     volumes:
       - ../backend/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasource.yml
       - grafana_data:/var/lib/grafana
-    restart: always
+    restart: unless-stopped
+    networks:
+      - backend-network
 
 
   nodeexporter:
@@ -266,6 +297,36 @@ services:
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
     ports:
       - "9100:9100"
+    networks:
+      - backend-network
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: securepassword
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_DISABLE_GZIP: "True"
+      PGADMIN_CONFIG_LOGIN_BANNER: '"pgAdmin behind Nginx"'
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/pgadmin-servers.json:/pgadmin4/servers.json
+      - ./pgadmin/.pgpass:/pgpass
+    env_file:
+      - .env
+    networks:
+      - backend-network
+
 
 
 volumes:
@@ -274,3 +335,11 @@ volumes:
   minio_data:
   minio_config:
   grafana_data:
+  pgadmin_data:
+
+networks:
+  backend-network:
+    driver: bridge
+
+
+# TODO: unload + rm ~/Library/LaunchAgents/com.quickflow.docker-compose.plist

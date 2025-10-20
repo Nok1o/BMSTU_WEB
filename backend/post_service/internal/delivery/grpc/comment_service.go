@@ -22,6 +22,7 @@ type CommentUseCase interface {
 	UnlikeComment(ctx context.Context, commentId uuid.UUID, userId uuid.UUID) error
 	GetComment(ctx context.Context, commentId uuid.UUID, userId uuid.UUID) (*models.Comment, error)
 	GetLastPostComment(ctx context.Context, postId uuid.UUID) (*models.Comment, error)
+	GetCommentLikes(ctx context.Context, commentId uuid.UUID, numLikes, offset int) ([]models.Like, error)
 }
 
 type CommentServiceServer struct {
@@ -192,4 +193,25 @@ func (c *CommentServiceServer) GetLastPostComment(ctx context.Context, req *pb.G
 		return nil, err
 	}
 	return &pb.GetLastPostCommentResponse{Comment: dto.ModelCommentToProto(comment)}, nil
+}
+func (c *CommentServiceServer) GetCommentLikes(ctx context.Context, req *pb.GetLikesRequest) (*pb.GetLikesResponse, error) {
+	logger.Info(ctx, "GetCommentLikes called")
+	commentId, err := uuid.Parse(req.CommentId)
+	if err != nil {
+		logger.Error(ctx, "Invalid comment ID:: %v", err)
+		return nil, err
+	}
+
+	numLikes := int(req.Count)
+	offset := int(req.Offset)
+
+	likes, err := c.commentUseCase.GetCommentLikes(ctx, commentId, numLikes, offset)
+	if err != nil {
+		logger.Error(ctx, "Failed to get comment likes:: %v", err)
+		return nil, err
+	}
+
+	protoLikes := dto.ModelLikeCommentToProto(likes)
+
+	return &pb.GetLikesResponse{Likes: protoLikes}, nil
 }

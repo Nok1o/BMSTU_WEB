@@ -33,6 +33,7 @@ type PostRepository interface {
 	CheckIfPostLiked(ctx context.Context, postId uuid.UUID, userId uuid.UUID) (bool, error)
 	UnlikePost(ctx context.Context, postId uuid.UUID, userId uuid.UUID) error
 	LikePost(ctx context.Context, postId uuid.UUID, userId uuid.UUID) error
+	GetPostLikes(ctx context.Context, postId uuid.UUID, numLikes, offset int) ([]models.Like, error)
 }
 
 type FileService interface {
@@ -77,10 +78,10 @@ func (p *PostUseCase) AddPost(ctx context.Context, post models.Post) (*models.Po
 
 // DeletePost removes post from the repository.
 func (p *PostUseCase) DeletePost(ctx context.Context, userId uuid.UUID, postId uuid.UUID) error {
-	//belongsTo, err := p.postRepo.BelongsTo(ctx, userId, postId)
-	//if err != nil {
-	//	return post_errors.ErrPostNotFound
-	//}
+	_, err := p.postRepo.BelongsTo(ctx, userId, postId)
+	if err != nil {
+		return post_errors.ErrPostNotFound
+	}
 
 	// TODO user_service
 	//if !belongsTo && user.Username != "Nikita" && user.Username != "rvasutenko" {
@@ -289,4 +290,16 @@ func (p *PostUseCase) GetPost(ctx context.Context, postId, userId uuid.UUID) (*m
 		return nil, fmt.Errorf("p.postRepo.CheckIfPostLiked: %w", err)
 	}
 	return &post, err
+}
+
+func (p *PostUseCase) GetPostLikes(ctx context.Context, postId uuid.UUID, numLikes, offset int) ([]models.Like, error) {
+	if postId == uuid.Nil {
+		return nil, fmt.Errorf("postId is empty")
+	}
+
+	likes, err := p.postRepo.GetPostLikes(ctx, postId, numLikes, offset)
+	if err != nil {
+		return nil, fmt.Errorf("p.postRepo.GetPostLikes: %w", err)
+	}
+	return likes, nil
 }

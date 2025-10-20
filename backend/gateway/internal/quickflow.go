@@ -241,7 +241,7 @@ func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 	protectedPost.HandleFunc("/api/v2/friend_requests/{request_id:[0-9a-fA-F-]{36}}", newFriendsHandler.Unfollow).Methods(http.MethodDelete)
 	protectedPost.HandleFunc("/api/v2/friend_requests/{request_id:[0-9a-fA-F-]{36}}", newFriendsHandler.ChangeRequestStatus).Methods(http.MethodPut)
 
-	protectedGet.HandleFunc("/api/v2/users/{username:string}/communities", newCommunityHandler.GetUserCommunities).Methods(http.MethodGet)
+	protectedGet.HandleFunc("/api/v2/users/{username}/communities", newCommunityHandler.GetUserCommunities).Methods(http.MethodGet)
 	protectedPost.HandleFunc("/api/v2/communities", newCommunityHandler.CreateCommunity).Methods(http.MethodPost)
 	protectedGet.HandleFunc("/api/v2/communities/{id:[0-9a-fA-F-]{36}}", newCommunityHandler.GetCommunityById).Methods(http.MethodGet)
 	apiDeleteRouter.HandleFunc("/api/v2/communities/{id:[0-9a-fA-F-]{36}}", newCommunityHandler.DeleteCommunity).Methods(http.MethodDelete)
@@ -250,7 +250,7 @@ func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 	protectedPost.HandleFunc("/api/v2/communities/{id:[0-9a-fA-F-]{36}}/members", newCommunityHandler.JoinCommunity).Methods(http.MethodPost)
 	protectedGet.HandleFunc("/api/v2/communities/{id:[0-9a-fA-F-]{36}}/members", newCommunityHandler.GetCommunityMembers).Methods(http.MethodGet)
 	apiDeleteRouter.HandleFunc("/api/v2/communities/{id:[0-9a-fA-F-]{36}}/members/{user_id:{[0-9a-fA-F-]{36}}", newCommunityHandler.LeaveCommunity).Methods(http.MethodDelete)
-	protectedPost.HandleFunc("/api/v2/communities/{id:[0-9a-fA-F-]{36}}/members/{user_id:{id:[0-9a-fA-F-]{36}}", newCommunityHandler.ChangeUserRole).Methods(http.MethodPatch)
+	protectedPost.HandleFunc("/api/v2/communities/{community_id:[0-9a-fA-F-]{36}}/members/{user_id:[0-9a-fA-F-]{36}}", newCommunityHandler.ChangeUserRole).Methods(http.MethodPatch)
 	protectedGet.HandleFunc("/api/v2/communities/{name}", newCommunityHandler.GetCommunityByName).Methods(http.MethodGet)
 	protectedGet.HandleFunc("/api/v2/communities/{name}/posts", newFeedHandler.FetchCommunityPosts).Methods(http.MethodGet)
 	protectedPost.HandleFunc("/api/v2/communities/{name}/posts", newPostHandler.AddPostCommunity).Methods(http.MethodPost)
@@ -266,6 +266,8 @@ func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 	protectedPost.HandleFunc("/api/v2/posts/{post_id:[0-9a-fA-F-]{36}}/comments/{comment_id:[0-9a-fA-F-]{36}}/likes", newCommentHandler.LikeComment).Methods(http.MethodPost)
 	apiDeleteRouter.HandleFunc("/api/v2/posts/{post_id:[0-9a-fA-F-]{36}}/likes/me", newPostHandler.UnlikePost).Methods(http.MethodDelete)
 	apiDeleteRouter.HandleFunc("/api/v2/posts/{post_id:[0-9a-fA-F-]{36}}/comments/{comment_id:[0-9a-fA-F-]{36}}/likes/me", newCommentHandler.UnlikeComment).Methods(http.MethodDelete)
+	protectedGet.HandleFunc("/api/v2/posts/{post_id:[0-9a-fA-F-]{36}}/likes", newPostHandler.GetPostLikes).Methods(http.MethodGet)
+	protectedGet.HandleFunc("/api/v2/posts/{post_id:[0-9a-fA-F-]{36}}/comments/{comment_id:[0-9a-fA-F-]{36}}/likes", newCommentHandler.GetCommentLikes).Methods(http.MethodGet)
 
 	// comments
 	protectedGet.HandleFunc("/api/v2/posts/{post_id:[0-9a-fA-F-]{36}}/comments", newCommentHandler.FetchCommentsForPost).Methods(http.MethodGet)

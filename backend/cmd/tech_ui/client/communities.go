@@ -2,8 +2,8 @@ package client
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
+	"mime/multipart"
 	"net/url"
 	"quickflow/cmd/tech_ui/models"
 )
@@ -75,20 +75,20 @@ func (c *APIClient) GetCommunityByName(name string) (*models.CommunityForm, erro
 }
 
 func (c *APIClient) CreateCommunity(nickname, name, description string) (*models.CommunityForm, error) {
-	// For simplicity, we'll create without file uploads
-	formData := map[string]string{
-		"nickname":    nickname,
-		"name":        name,
-		"description": description,
-	}
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
 
-	jsonData, err := json.Marshal(formData)
-	if err != nil {
+	_ = writer.WriteField("nickname", nickname)
+	_ = writer.WriteField("name", name)
+	_ = writer.WriteField("description", description)
+
+	// ВАЖНО: закрыть writer, чтобы записать закрывающее boundary!
+	if err := writer.Close(); err != nil {
 		return nil, err
 	}
 
-	resp, err := c.doRequest("POST", "/api/v2/communities", bytes.NewBuffer(jsonData), map[string]string{
-		"Content-Type": "application/json",
+	resp, err := c.doRequest("POST", "/api/v2/communities", &body, map[string]string{
+		"Content-Type": writer.FormDataContentType(),
 	})
 	if err != nil {
 		return nil, err
@@ -121,7 +121,7 @@ func (c *APIClient) JoinCommunity(communityID string) error {
 		return err
 	}
 
-	if resp.StatusCode != 204 {
+	if resp.StatusCode > 204 {
 		return fmt.Errorf("join failed with status: %d", resp.StatusCode)
 	}
 
@@ -191,4 +191,26 @@ func (c *APIClient) CreateCommunityPost(communityName string, form models.Commen
 	}
 
 	return &post, nil
+}
+
+// ChangeCommunityMemberRole меняет роль участника в сообществе
+func (c *APIClient) ChangeCommunityMemberRole(communityID, userID, role string) error {
+	reqBody := struct {
+		Role string `json:"role"`
+	}{Role: role}
+
+	resp, err := c.doJSONRequest(
+		"PATCH",
+		fmt.Sprintf("/api/v2/communities/%s/members/%s", communityID, userID),
+		reqBody,
+	)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 204 {
+		return fmt.Errorf("change role failed with status %d", resp.StatusCode)
+	}
+	return nil
 }

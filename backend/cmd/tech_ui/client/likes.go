@@ -52,9 +52,37 @@ func (c *APIClient) UnlikeComment(postID, commentID string) error {
 		return err
 	}
 
-	if resp.StatusCode != 204 {
+	if resp.StatusCode > 204 {
 		return fmt.Errorf("unlike failed with status: %d", resp.StatusCode)
 	}
 
 	return nil
+}
+
+func (c *APIClient) GetPostLikes(postID string) ([]models.LikeForm, error) {
+	resp, err := c.doRequest("GET", "/api/v2/posts/"+postID+"/likes", nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var likes []models.LikeForm
+	if err := c.parseResponse(resp, &likes); err != nil {
+		return nil, err
+	}
+
+	return likes, nil
+}
+
+func (c *APIClient) GetCommentLikes(postID, commentID string) ([]models.LikeForm, error) {
+	resp, err := c.doRequest("GET", "/api/v2/posts/"+postID+"/comments/"+commentID+"/likes", nil, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var likes []models.LikeForm
+	if err := c.parseResponse(resp, &likes); err != nil {
+		return nil, err
+	}
+
+	return likes, nil
 }
