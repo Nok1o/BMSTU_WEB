@@ -145,8 +145,8 @@ func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 
 	}).Methods(http.MethodOptions)
 
-	r.HandleFunc("/hello", newAuthHandler.Greet).Methods(http.MethodGet)
-	r.HandleFunc("/profiles/{username}", newProfileHandler.GetProfile).Methods(http.MethodGet)
+	r.HandleFunc("/api/v1/hello", newAuthHandler.Greet).Methods(http.MethodGet)
+	r.HandleFunc("/api/v1/profiles/{username}", newProfileHandler.GetProfile).Methods(http.MethodGet)
 	r.Handle("/metrics", promhttp.Handler()).Methods(http.MethodGet)
 
 	apiPostRouter := r.PathPrefix("/").Subrouter()
