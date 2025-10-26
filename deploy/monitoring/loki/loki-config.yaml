@@ -3,6 +3,11 @@ auth_enabled: false
 server:
   http_listen_port: 3100
   grpc_listen_port: 9096
+  grpc_server_max_recv_msg_size: 4194304
+  grpc_server_max_send_msg_size: 4194304
+  http_server_read_timeout: 300s
+  http_server_write_timeout: 300s
+  log_level: warn
 
 common:
   path_prefix: /loki
@@ -16,12 +21,71 @@ common:
     kvstore:
       store: inmemory
 
+frontend:
+  max_outstanding_per_tenant: 4096
+  compress_responses: true
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 4096
+
+querier:
+  max_concurrent: 256
+  query_timeout: 300s
+  query_ingesters_within: 1h
+  tail_max_duration: 1h
+
 query_range:
+  parallelise_shardable_queries: true
   results_cache:
     cache:
       embedded_cache:
         enabled: true
-        max_size_mb: 100
+        max_size_mb: 500
+        ttl: 1h
+  cache_results: true
+  align_queries_with_step: true
+  max_retries: 3
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory
+      replication_factor: 1
+    final_sleep: 0s
+  chunk_idle_period: 1h
+  max_chunk_age: 1h
+  chunk_target_size: 1572864
+  chunk_retain_period: 30s
+  max_transfer_retries: 0
+  wal:
+    enabled: true
+    dir: /loki/wal
+
+limits_config:
+  reject_old_samples: true
+  reject_old_samples_max_age: 168h
+  ingestion_rate_mb: 32
+  ingestion_burst_size_mb: 64
+  max_entries_limit_per_query: 5000
+  retention_period: 720h
+  max_query_length: 721h
+  max_query_parallelism: 32
+  cardinality_limit: 100000
+  max_streams_per_user: 10000
+  max_global_streams_per_user: 0
+  max_line_size: 256000
+  per_stream_rate_limit: 10MB
+  per_stream_rate_limit_burst: 15MB
+  # Перемещено из query_range в 2.9.0
+  split_queries_by_interval: 24h
+
+chunk_store_config:
+  max_look_back_period: 0s
+
+table_manager:
+  retention_deletes_enabled: true
+  retention_period: 720h
 
 schema_config:
   configs:
@@ -33,8 +97,18 @@ schema_config:
         prefix: index_
         period: 24h
 
+compactor:
+  working_directory: /loki/compactor
+  shared_store: filesystem
+  retention_enabled: true
+
 ruler:
   alertmanager_url: http://localhost:9093
+  enable_api: true
+  enable_alertmanager_v2: true
+  ring:
+    kvstore:
+      store: inmemory
 
 analytics:
   reporting_enabled: false

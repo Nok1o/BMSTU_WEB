@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"net/http"
-	"quickflow/shared/logger"
 	"strings"
 
 	"quickflow/config/cors"
@@ -22,7 +21,6 @@ func CORSMiddleware(config *cors_config.CORSConfig) func(http.Handler) http.Hand
 			r = r.WithContext(http2.SetRequestId(r.Context()))
 
 			origin := r.Header.Get("Origin")
-			logger.Info(r.Context(), "CORS middleware got request from origin: "+origin+", with method: "+r.Method)
 
 			// Проверяем, не установлен ли уже CORS-заголовок
 			if _, exists := w.Header()["Access-Control-Allow-Origin"]; !exists {
