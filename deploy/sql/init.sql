@@ -345,12 +345,15 @@ EXECUTE FUNCTION update_chat_updated_at();
 DO $$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'readonly') THEN
-CREATE ROLE readonly;
+CREATE ROLE readonly WITH LOGIN PASSWORD 'readonly_pass';
+ELSE
+        -- Если роль уже существует — обновим пароль
+        ALTER ROLE readonly WITH LOGIN PASSWORD 'readonly_pass';
 END IF;
 END
 $$;
 
--- Даём права на подключение к БД
+-- Даём подключение к базе
 GRANT CONNECT ON DATABASE quickflow_db TO readonly;
 
 -- Даём USAGE на схему
@@ -359,9 +362,16 @@ GRANT USAGE ON SCHEMA public TO readonly;
 -- Даём SELECT на все существующие таблицы
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly;
 
--- Даём SELECT на все будущие таблицы
+-- Даём SELECT на все существующие последовательности (для SERIAL/IDENTITY)
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly;
+
+-- Будущие таблицы
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO readonly;
 
--- Опционально: разрешаем SELECT на последовательности (если используются SERIAL)
-GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly;
+-- Будущие последовательности
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON SEQUENCES TO readonly;
+
+
+-- replication
+CREATE USER replicator WITH REPLICATION ENCRYPTED PASSWORD 'replicator_pass';
+SELECT pg_create_physical_replication_slot('slave_slot');

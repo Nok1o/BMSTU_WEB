@@ -130,6 +130,7 @@ func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 	r.Use(mux.CORSMethodMiddleware(r))
 	r.Use(middleware.RecoveryMiddleware)
 	r.Use(middleware.MetricsMiddleware(metrics))
+	r.Use(middleware.ReadOnlyMiddleware)
 	r.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})

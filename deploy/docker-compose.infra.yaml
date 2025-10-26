@@ -1,0 +1,212 @@
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: quickflow_admin
+      POSTGRES_PASSWORD: SuperSecurePassword1
+      POSTGRES_DB: quickflow_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../deploy/sql:/docker-entrypoint-initdb.d
+      - ./config/postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf:ro
+    env_file:
+      - .env
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U quickflow_admin -d quickflow_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c wal_level=replica
+      -c max_wal_senders=3
+      -c max_replication_slots=3
+      -c hot_standby=on
+      -c hba_file=/etc/postgresql/pg_hba.conf
+    networks:
+      - backend-network
+
+  postgres-slave:
+    image: postgres:15
+    container_name: postgres-slave
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: replicator
+      POSTGRES_PASSWORD: replicator_pass
+      PGDATA: /var/lib/postgresql/data
+    env_file: []
+    user: postgres
+    volumes:
+      - postgres_slave_data:/var/lib/postgresql/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "5433:5432"
+    command: >
+      bash -c "
+        echo 'Waiting for master to be ready...';
+        until pg_isready -h postgres -p 5432; do
+          sleep 2;
+        done;
+      
+        echo 'Checking if data directory is empty...';
+        if [ ! -f /var/lib/postgresql/data/postgresql.conf ]; then
+          echo 'Running pg_basebackup...';
+          PGPASSWORD=replicator_pass pg_basebackup -h postgres -U replicator -D /var/lib/postgresql/data -Fp -Xs -P -R -S slave_slot;
+          echo 'Fixing permissions...';
+          chmod 700 /var/lib/postgresql/data;
+          echo 'Basebackup completed successfully';
+        else
+          echo 'Data directory already exists, skipping basebackup';
+        fi;
+      
+        echo 'Starting standby server...';
+        exec postgres
+      "
+    networks:
+      - backend-network
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./config/redis/redis.conf:/etc/redis/redis.conf
+    command: [ "redis-server", "/etc/redis/redis.conf" ]
+    networks:
+      - backend-network
+
+  # s3 хранилище minio
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+    environment:
+      - MINIO_MODE=production
+      - MINIO_DATA_DIR=/data  # Путь хранения данных
+      - MINIO_CONFIG_DIR=/root/.minio  # Путь конфигурации
+    volumes:
+      - minio_data:/data
+      - minio_config:/root/.minio
+    command: server /data --console-address ":9001"
+    env_file:
+      - .env
+    networks:
+      - backend-network
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:latest
+    volumes:
+      - ../backend/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - backend-network
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_SERVER_ROOT_URL=https://quickflowapp.ru/grafana/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+    volumes:
+      - ../backend/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasource.yml
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - backend-network
+
+
+  nodeexporter:
+    container_name: node_exporter
+    image: prom/node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
+    ports:
+      - "9100:9100"
+    networks:
+      - backend-network
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: securepassword
+      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_DISABLE_GZIP: "True"
+      PGADMIN_CONFIG_LOGIN_BANNER: '"pgAdmin behind Nginx"'
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/pgadmin-servers.json:/pgadmin4/servers.json
+      - ./pgadmin/.pgpass:/pgpass
+    env_file:
+      - .env
+    networks:
+      - backend-network
+
+  adminer:
+    image: adminer:4.8.1
+    container_name: db_adminer
+    restart: always
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+    depends_on:
+      - postgres
+    networks:
+      - backend-network
+    ports:
+      - "5051:8080"
+
+volumes:
+  postgres_data:
+  postgres_slave_data:
+  redis_data:
+  minio_data:
+  minio_config:
+  grafana_data:
+  pgadmin_data:
+
+networks:
+  backend-network:
+    name: "backend-network"
+    driver: bridge

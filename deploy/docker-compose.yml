@@ -1,43 +1,28 @@
 services:
+
   gateway:
     build:
       context: ../backend
       dockerfile: gateway/Dockerfile
-    container_name: gateway
+    container_name: ${GATEWAY_NAME:-gateway}
     ports:
-      - "8080:8080"  # HTTP Gateway порт
+      - "${GATEWAY_PORT:-8080}:8080"
     volumes:
       - ../deploy/config:/config
     depends_on:
-      post_service:
-        condition: service_started
-      user_service:
-        condition: service_started
-      file_service:
-        condition: service_started
-      messenger_service:
-        condition: service_started
-      feedback_service:
-        condition: service_started
-      community_service:
-        condition: service_started
-      friends_service:
-        condition: service_started
-      minio:
-        condition: service_healthy
-      redis:
-        condition: service_started
-      postgres:
-        condition: service_started
-      prometheus:
-        condition: service_started
-      grafana:
-        condition: service_started
+      # Условия остаются, но имена сервисов тоже можно параметризовать
+      - post_service
+      - user_service
+      - file_service
+      - messenger_service
+      #- feedback_service
+      - friends_service
+      - community_service
     restart: unless-stopped
     environment:
       RUNNING_IN_CONTAINER: true
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     networks:
       - backend-network
 
@@ -45,23 +30,16 @@ services:
     build:
       context: ../backend
       dockerfile: file_service/Dockerfile
-    container_name: file_service
+    container_name: ${FILE_SERVICE_NAME:-file_service}
+    ports:
+      - "${FILE_SERVICE_PORT:-8081}:8081"
     volumes:
       - ../deploy/config:/config
-    ports:
-      - "8081:8081"
-    depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_healthy
     restart: unless-stopped
     environment:
       RUNNING_IN_CONTAINER: true
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     networks:
       - backend-network
 
@@ -69,21 +47,14 @@ services:
     build:
       context: ../backend
       dockerfile: post_service/Dockerfile
-    container_name: post_service
+    container_name: ${POST_SERVICE_NAME:-post_service}
+    ports:
+      - "${POST_SERVICE_PORT:-8082}:8082"
     volumes:
       - ../deploy/config:/config
-    ports:
-      - "8082:8082"
-    depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_healthy
     restart: unless-stopped
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     networks:
       - backend-network
 
@@ -91,19 +62,14 @@ services:
     build:
       context: ../backend
       dockerfile: user_service/Dockerfile
-    container_name: user_service
+    container_name: ${USER_SERVICE_NAME:-user_service}
+    ports:
+      - "${USER_SERVICE_PORT:-8083}:8083"
     volumes:
       - ../deploy/config:/config
-    ports:
-      - "8083:8083"
-    depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
     restart: unless-stopped
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     networks:
       - backend-network
 
@@ -111,63 +77,44 @@ services:
     build:
       context: ../backend
       dockerfile: messenger_service/Dockerfile
-    container_name: messenger_service
+    container_name: ${MESSENGER_SERVICE_NAME:-messenger_service}
+    ports:
+      - "${MESSENGER_SERVICE_PORT:-8084}:8084"
     volumes:
       - ../deploy/config:/config
-    ports:
-      - "8084:8084"
-    depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_healthy
     restart: unless-stopped
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     networks:
       - backend-network
 
-  feedback_service:
-    build:
-      context: ../backend
-      dockerfile: feedback_service/Dockerfile
-    container_name: feedback_service
-    volumes:
-      - ../deploy/config:/config
-    ports:
-      - "8085:8085"
-    depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_healthy
-    restart: unless-stopped
-    env_file:
-      - .env
-    networks:
-      - backend-network
+#  feedback_service:
+#    build:
+#      context: ../backend
+#      dockerfile: feedback_service/Dockerfile
+#    container_name: ${FEEDBACK_SERVICE_NAME:-feedback_service}
+#    ports:
+#      - "${FEEDBACK_SERVICE_PORT:-8085}:8085"
+#    volumes:
+#      - ../deploy/config:/config
+#    restart: unless-stopped
+#    env_file:
+#      - ${ENV_FILE:-.env}
+#    networks:
+#      - backend-network
 
   friends_service:
     build:
       context: ../backend
       dockerfile: ../backend/friends_service/Dockerfile
-    container_name: friends_service
+    container_name: ${FRIENDS_SERVICE_NAME:-friends_service}
+    ports:
+      - "${FRIENDS_SERVICE_PORT:-8086}:8086"
     volumes:
       - ../deploy/config:/config
-    ports:
-      - "8086:8086"
-    depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
     restart: unless-stopped
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     networks:
       - backend-network
 
@@ -175,200 +122,21 @@ services:
     build:
       context: ../backend
       dockerfile: community_service/Dockerfile
-    container_name: community_service
+    container_name: ${COMMUNITY_SERVICE_NAME:-community_service}
+    ports:
+      - "${COMMUNITY_SERVICE_PORT:-8087}:8087"
     volumes:
       - ../deploy/config:/config
-    ports:
-      - "8087:8087"
-    depends_on:
-      postgres:
-        condition: service_started
-      redis:
-        condition: service_started
-      minio:
-        condition: service_healthy
     restart: unless-stopped
     env_file:
-      - .env
+      - ${ENV_FILE:-.env}
     networks:
       - backend-network
-
-  postgres:
-    image: postgres:15
-    container_name: postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: quickflow_admin
-      POSTGRES_PASSWORD: SuperSecurePassword1
-      POSTGRES_DB: quickflow_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ../deploy/sql:/docker-entrypoint-initdb.d
-    env_file:
-      - .env
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U quickflow_admin -d quickflow_db" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    networks:
-      - backend-network
-
-  redis:
-    image: redis:latest
-    container_name: redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-      - ./config/redis/redis.conf:/etc/redis/redis.conf
-    command: [ "redis-server", "/etc/redis/redis.conf" ]
-    networks:
-      - backend-network
-
-  # s3 хранилище minio
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-      interval: 10s
-      timeout: 10s
-      retries: 3
-    environment:
-      - MINIO_MODE=production
-      - MINIO_DATA_DIR=/data  # Путь хранения данных
-      - MINIO_CONFIG_DIR=/root/.minio  # Путь конфигурации
-    volumes:
-      - minio_data:/data
-      - minio_config:/root/.minio
-    command: server /data --console-address ":9001"
-    env_file:
-      - .env
-    networks:
-      - backend-network
-
-  prometheus:
-    container_name: prometheus
-    image: prom/prometheus:latest
-    volumes:
-      - ../backend/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    networks:
-      - backend-network
-
-  grafana:
-    image: grafana/grafana:11.3.0
-    container_name: grafana
-    ports:
-      - "3001:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=password
-      - GF_SERVER_ROOT_URL=https://quickflowapp.ru/grafana/
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
-    volumes:
-      - ../backend/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasource.yml
-      - grafana_data:/var/lib/grafana
-    restart: unless-stopped
-    networks:
-      - backend-network
-
-
-  nodeexporter:
-    container_name: node_exporter
-    image: prom/node-exporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'
-    ports:
-      - "9100:9100"
-    networks:
-      - backend-network
-    restart: unless-stopped
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: securepassword
-      PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "False"
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-      PGADMIN_CONFIG_DISABLE_GZIP: "True"
-      PGADMIN_CONFIG_LOGIN_BANNER: '"pgAdmin behind Nginx"'
-    ports:
-      - "5050:80"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
-      - ./pgadmin/pgadmin-servers.json:/pgadmin4/servers.json
-      - ./pgadmin/.pgpass:/pgpass
-    env_file:
-      - .env
-    networks:
-      - backend-network
-
-  adminer:
-    image: adminer:4.8.1
-    container_name: db_adminer
-    restart: always
-    environment:
-      - ADMINER_DEFAULT_SERVER=postgres
-    depends_on:
-      - postgres
-    networks:
-      - backend-network
-    ports:
-      - "5051:8080"
-
-#  pgadmin:
-#    image: dpage/pgadmin4:8.10
-#    container_name: pgadmin
-#    environment:
-#      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-#      PGADMIN_DEFAULT_PASSWORD: admin
-#    ports:
-#      - "5050:80"
-#    depends_on:
-#      - postgres
-#    networks:
-#      - backend-network
-#    restart: always
-#    volumes:
-#      - pgadmin_data:/var/lib/pgadmin
-#      - ./pgadmin/pgadmin-servers.json:/pgadmin4/servers.json
-#      - ./pgadmin/.pgpass:/pgpass
-
-volumes:
-  postgres_data:
-  redis_data:
-  minio_data:
-  minio_config:
-  grafana_data:
-  pgadmin_data:
 
 networks:
   backend-network:
-    driver: bridge
+    name: "backend-network"
+    external: true
 
 
 # TODO: unload + rm ~/Library/LaunchAgents/com.quickflow.docker-compose.plist

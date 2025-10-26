@@ -118,7 +118,7 @@ func (u *PostgresUserRepository) GetUserByUId(ctx context.Context, userId uuid.U
 		userId).Scan(&userPostgres.Id, &userPostgres.Username,
 		&userPostgres.Password, &userPostgres.Salt)
 	if err != nil {
-		return models.User{}, errors.New("user not found")
+		return models.User{}, fmt.Errorf("user not found: %v", err)
 	}
 
 	return userPostgres.ConvertToUser(), nil

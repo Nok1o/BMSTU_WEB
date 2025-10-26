@@ -63,7 +63,7 @@ func (c *Client) AuthUser(ctx context.Context, authData shared_models.LoginData)
 		},
 	}
 
-	logger.Info(ctx, "Sending request to authenticate user: %v", req)
+	logger.Info(ctx, "Sending request to authenticate user: %v", req.SignIn.Username)
 	resp, err := c.client.SignIn(ctx, req)
 	if err != nil {
 		logger.Error(ctx, "Failed to authenticate user: %v", err)

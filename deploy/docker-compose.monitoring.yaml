@@ -1,0 +1,67 @@
+# docker-compose.monitoring.yml
+
+version: '3.8'
+
+services:
+  loki:
+    image: grafana/loki:2.9.0
+    container_name: loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+      - ./monitoring/loki/loki-config.yaml:/etc/loki/local-config.yaml
+    networks:
+      - monitoring-network
+
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      # Логи Docker-контейнеров
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Кастомные логи (если есть)
+      - ./logs:/var/log/application:ro
+      - ./monitoring/promtail/promtail-config.yaml:/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml
+    environment:
+      # Чтобы не писать в логи о health check'ах
+      - HOSTNAME=${HOSTNAME:-localhost}
+    depends_on:
+      - loki
+    networks:
+      - monitoring-network
+
+  grafana:
+    image: grafana/grafana:11.3.0
+    container_name: grafana-monitoring
+    restart: unless-stopped
+    ports:
+      - "3002:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_SERVER_DOMAIN=localhost
+      - GF_SERVER_ROOT_URL=http://localhost:8090/monitoring/
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_LOG_LEVEL=debug
+    volumes:
+      - grafana_monitoring_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - loki
+    networks:
+      - monitoring-network
+
+volumes:
+  loki_data:
+  grafana_monitoring_data:
+
+networks:
+  monitoring-network:
+    driver: bridge

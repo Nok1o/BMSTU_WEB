@@ -26,18 +26,15 @@ func CORSMiddleware(config *cors_config.CORSConfig) func(http.Handler) http.Hand
 
 			// Проверяем, не установлен ли уже CORS-заголовок
 			if _, exists := w.Header()["Access-Control-Allow-Origin"]; !exists {
-				logger.Info(r.Context(), "Setting CORS headers for origin: %v", origin)
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Vary", "Origin")
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
-				logger.Info(r.Context(), "allowed methods: %v", strings.Join(config.AllowedMethods, ", "))
 				w.Header().Set("Access-Control-Allow-Methods", strings.Join(config.AllowedMethods, ", "))
 				w.Header().Set("Access-Control-Allow-Headers", strings.Join(config.AllowedHeaders, ", "))
 			}
 
 			// Если OPTIONS-запрос, отвечаем 204
 			if r.Method == http.MethodOptions {
-				logger.Info(r.Context(), "Setting CORS options for request: %v", r.URL)
 				w.WriteHeader(http.StatusNoContent)
 				return
 			}
