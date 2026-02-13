@@ -1,0 +1,31 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Указываем, какие базовые ресурсы использовать
+resources:
+  - manifests/community-service.yaml
+  - manifests/file-service.yaml
+  - manifests/friends-service.yaml
+  - manifests/gateway.yaml
+  - manifests/post-service.yaml
+  - manifests/user-service.yaml
+  - manifests/messenger-service.yaml
+  - manifests/dbs.yaml
+  - manifests/minio.yaml
+  - configmap.yaml
+  - secrets.yaml
+namespace: quickflow
+
+configMapGenerator:
+  - name: feeder-config
+    files:
+      - config/feeder/config.toml
+  - name: cors-config
+    files:
+      - config/cors/config.toml
+  - name: minio-config
+    files:
+      - config/minio/config.toml
+  - name: gateway-validation-config
+    files:
+      - config/validation/config.toml

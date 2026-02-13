@@ -18,67 +18,68 @@ func getPortFromEnv(envKey string, defaultValue int) int {
 
 // Gateway
 const (
-	DefaultGatewayServiceAddrEnv = "GATEWAY_SERVICE_ADDR"
-	DefaultGatewayServiceName    = "gateway service"
+	DefaultGatewayServiceName = "gateway"
 )
-
-var DefaultGatewayServicePort = getPortFromEnv("GATEWAY_SERVICE_PORT", 8080)
 
 // File Service
 const (
-	DefaultFileServiceAddrEnv = "FILE_SERVICE_ADDR"
-	DefaultFileServiceName    = "file service"
+	DefaultFileServiceName = "file-service"
 )
 
 var DefaultFileServicePort = getPortFromEnv("FILE_SERVICE_PORT", 8081)
 
 // Post Service
 const (
-	DefaultPostServiceAddrEnv = "POST_SERVICE_ADDR"
-	DefaultPostServiceName    = "post service"
+	DefaultPostServiceName = "post-service"
 )
 
 var DefaultPostServicePort = getPortFromEnv("POST_SERVICE_PORT", 8082)
 
 // User Service
 const (
-	DefaultUserServiceAddrEnv = "USER_SERVICE_ADDR"
-	DefaultUserServiceName    = "user service"
+	DefaultUserServiceName = "user-service"
 )
 
 var DefaultUserServicePort = getPortFromEnv("USER_SERVICE_PORT", 8083)
 
 // Messenger Service
 const (
-	DefaultMessengerServiceAddrEnv = "MESSENGER_SERVICE_ADDR"
-	DefaultMessengerServiceName    = "messenger service"
+	DefaultMessengerServiceName = "messenger-service"
 )
 
 var DefaultMessengerServicePort = getPortFromEnv("MESSENGER_SERVICE_PORT", 8084)
 
 // Feedback Service
 const (
-	DefaultFeedbackServiceAddrEnv = "FEEDBACK_SERVICE_ADDR"
-	DefaultFeedbackServiceName    = "feedback service"
+	DefaultFeedbackServiceName = "feedback-service"
 )
 
 var DefaultFeedbackServicePort = getPortFromEnv("FEEDBACK_SERVICE_PORT", 8085)
 
 // Friends Service
 const (
-	DefaultFriendsServiceAddrEnv = "FRIENDS_SERVICE_ADDR"
-	DefaultFriendsServiceName    = "friends service"
+	DefaultFriendsServiceName = "friends-service"
 )
 
 var DefaultFriendsServicePort = getPortFromEnv("FRIENDS_SERVICE_PORT", 8086)
 
 // Community Service
 const (
-	DefaultCommunityServiceAddrEnv = "COMMUNITY_SERVICE_ADDR"
-	DefaultCommunityServiceName    = "community service"
+	DefaultCommunityServiceName = "community-service"
 )
 
 var DefaultCommunityServicePort = getPortFromEnv("COMMUNITY_SERVICE_PORT", 8087)
 
 // Max message size
 const MaxMessageSize = 15 * 1024 * 1024
+
+var DefaultServicePorts = map[string]string{
+	"gateway":           "8080",
+	"file-service":      "8081",
+	"post-service":      "8082",
+	"user-service":      "8083",
+	"messenger-service": "8084",
+	"feedback-service":  "8085",
+	"friends-service":   "8086",
+	"community-service": "8087",
+}

@@ -3,15 +3,13 @@ package internal
 import (
 	"fmt"
 	"net/http"
+	service_discovery "quickflow/utils/service-discovery"
 	"strings"
 
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
 	"quickflow/config"
 	addr "quickflow/config/micro-addr"
 	qfhttp "quickflow/gateway/internal/delivery/http"
@@ -26,56 +24,51 @@ import (
 	postService "quickflow/shared/client/post_service"
 	userService "quickflow/shared/client/user_service"
 	"quickflow/shared/interceptors"
-	getEnv "quickflow/utils/get-env"
 )
 
 func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 	metrics := metrics.NewMetrics("QuickFlow")
 
-	grpcConnPostService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultPostServiceAddrEnv, addr.DefaultPostServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnPostService, err := service_discovery.NewGRPCClient(
+		addr.DefaultPostServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to post service: %w", err)
 	}
 
-	grpcConnUserService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultUserServiceAddrEnv, addr.DefaultUserServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnUserService, err := service_discovery.NewGRPCClient(
+		addr.DefaultUserServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to user service: %w", err)
 	}
 
-	grpcConnMessengerService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultMessengerServiceAddrEnv, addr.DefaultMessengerServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnMessengerService, err := service_discovery.NewGRPCClient(
+		addr.DefaultMessengerServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 
-	grpcConnFeedbackService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultFeedbackServiceAddrEnv, addr.DefaultFeedbackServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnFeedbackService, err := service_discovery.NewGRPCClient(
+		addr.DefaultFeedbackServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 
-	grpcConnFriendsService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultFriendsServiceAddrEnv, addr.DefaultFriendsServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnFriendsService, err := service_discovery.NewGRPCClient(
+		addr.DefaultFriendsServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 
-	grcpConnCommunityService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultCommunityServiceAddrEnv, addr.DefaultCommunityServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grcpConnCommunityService, err := service_discovery.NewGRPCClient(
+		addr.DefaultCommunityServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 
 	// services
@@ -288,11 +281,10 @@ func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 }
 
 func getFileService() (*file_service.FileClient, error) {
-	grpcConnFileService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultFileServiceAddrEnv, addr.DefaultFileServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnFileService, err := service_discovery.NewGRPCClient(
+		addr.DefaultFileServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to file service: %w", err)

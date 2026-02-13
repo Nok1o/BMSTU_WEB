@@ -9,12 +9,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	service_discovery "quickflow/utils/service-discovery"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
 	"quickflow/community_service/config"
 	grpc3 "quickflow/community_service/internal/delivery/grpc"
 	"quickflow/community_service/internal/delivery/grpc/interceptor"
@@ -28,7 +27,6 @@ import (
 	"quickflow/shared/interceptors"
 	"quickflow/shared/logger"
 	proto "quickflow/shared/proto/community_service"
-	getEnv "quickflow/utils/get-env"
 )
 
 func resolveConfigPath(rel string) string {
@@ -54,11 +52,10 @@ func main() {
 	}
 	defer listener.Close()
 
-	grpcConnFileService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultFileServiceAddrEnv, addr.DefaultFileServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnFileService, err := service_discovery.NewGRPCClient(
+		addr.DefaultFileServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 
 	if err != nil {

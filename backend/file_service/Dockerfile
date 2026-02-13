@@ -16,7 +16,7 @@ COPY . .
 WORKDIR /app/file_service
 
 # Собираем сервис
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o file_service ./internal/server.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -o file_service ./internal/server.go
 
 # Стейдж финальный
 FROM debian:bookworm-slim
@@ -26,13 +26,14 @@ WORKDIR /root/
 RUN apt-get update && apt-get install -y \
     curl \
     bash \
-    && curl -sL https://dl.min.io/client/mc/release/linux-amd64/mc -o /usr/local/bin/mc \
+    && curl -sLf https://dl.min.io/client/mc/release/linux-arm64/mc -o /usr/local/bin/mc \
     && chmod +x /usr/local/bin/mc \
     && apt-get clean
 
 COPY --from=builder /app/file_service/file_service .
 
 COPY --from=builder /app/file_service/deploy/config ./config
+COPY --from=builder /app/file_service/deploy/config /config
 
 COPY --from=builder /usr/local/bin/setup-minio-buckets.sh /usr/local/bin/setup-minio-buckets.sh
 
@@ -42,6 +43,10 @@ RUN chmod +x /usr/local/bin/setup-minio-buckets.sh
 # Добавь перед CMD для вывода путей
 RUN ls -l /usr/local/bin/setup-minio-buckets.sh
 
+# Загружаем переменные в окружение контейнера
+ARG SCHEME
+ARG MINIO_PUBLIC_ENDPOINT
+
 RUN echo "SCHEME=$SCHEME" && \
     if [ "$SCHEME" == "https" ]; then \
         printf "\nMINIO_SCHEME=https" >> /etc/environment && \
@@ -50,10 +55,6 @@ RUN echo "SCHEME=$SCHEME" && \
         printf "\nMINIO_SCHEME=http" >> /etc/environment && \
         printf "\nMINIO_PUBLIC_ENDPOINT=localhost:9000" >> /etc/environment; \
     fi
-
-# Загружаем переменные в окружение контейнера
-ARG SCHEME
-ARG MINIO_PUBLIC_ENDPOINT
 
 ENV MINIO_SCHEME=${SCHEME}
 ENV MINIO_PUBLIC_ENDPOINT=${MINIO_PUBLIC_ENDPOINT}

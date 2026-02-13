@@ -8,12 +8,11 @@ import (
 	"net"
 	"net/http"
 	redis2 "quickflow/config/redis"
+	service_discovery "quickflow/utils/service-discovery"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
 	addr "quickflow/config/micro-addr"
 	postgresConfig "quickflow/config/postgres"
 	"quickflow/metrics"
@@ -26,7 +25,6 @@ import (
 	"quickflow/user_service/internal/repository/postgres"
 	"quickflow/user_service/internal/repository/redis"
 	"quickflow/user_service/internal/usecase"
-	getEnv "quickflow/utils/get-env"
 )
 
 func main() {
@@ -36,11 +34,10 @@ func main() {
 	}
 	defer listener.Close()
 
-	grpcConn, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultFileServiceAddrEnv, addr.DefaultFileServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConn, err := service_discovery.NewGRPCClient(
+		addr.DefaultFileServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 
 	if err != nil {

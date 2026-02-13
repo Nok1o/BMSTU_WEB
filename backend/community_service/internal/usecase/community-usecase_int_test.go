@@ -11,14 +11,11 @@ import (
 	"fmt"
 	"github.com/ozontech/allure-go/pkg/allure"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"math/rand"
 	"quickflow/community_service/config"
 	"quickflow/community_service/internal/repository/postgres"
 	"quickflow/community_service/utils/validation"
-	addr "quickflow/config/micro-addr"
 	"quickflow/config/test"
 	fileService "quickflow/shared/client/file_service"
 	"quickflow/shared/interceptors"
@@ -207,11 +204,10 @@ func (s *CommunityUseCaseIntegrationSuite) BeforeAll(t provider.T) {
 	err = s.db.Ping()
 	require.NoError(t, err, "Failed to ping database")
 
-	grpcConnFileService, err := grpc.NewClient(
-		getEnv.GetServiceAddr(addr.DefaultFileServiceAddrEnv, addr.DefaultFileServicePort),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+	grpcConnFileService, err := service_discovery.NewGRPCClient(
+		addr.DefaultFileServiceName,
+		service_discovery.ModeFailover,
+		interceptors.RequestIDClientInterceptor(),
 	)
 
 	if err != nil {

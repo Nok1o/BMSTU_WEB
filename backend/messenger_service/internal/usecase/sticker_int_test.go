@@ -24,8 +24,6 @@ import (
 	"github.com/ozontech/allure-go/pkg/framework/provider"
 	"github.com/ozontech/allure-go/pkg/framework/suite"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
 	messenger_errors "quickflow/messenger_service/internal/errors"
 	"quickflow/shared/models"
 )
@@ -62,11 +60,9 @@ func (s *StickerServiceTestSuite) BeforeAll(t provider.T) {
 		}
 
 		// Setup gRPC connection for file service
-		grpcConnFileService, err := grpc.NewClient(
-			getEnv.GetServiceAddr(addr.DefaultFileServiceAddrEnv, addr.DefaultFileServicePort),
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-			grpc.WithUnaryInterceptor(interceptors.RequestIDClientInterceptor()),
-			grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(addr.MaxMessageSize)),
+		grpcConnFileService, err := service_discovery.NewGRPCClient(
+			addr.DefaultFileServiceName,
+			interceptors.RequestIDClientInterceptor(),
 		)
 		if err != nil {
 			log.Fatalf("failed to connect to file service: %v", err)

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: community-service-deployment
+  labels:
+    app: community-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: community-service
+  template:
+    metadata:
+      labels:
+        app: community-service
+    spec:
+      containers:
+        - name: community-service
+          image: qf-community-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8087
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secrets
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: community-service # DNS-имя для доступа внутри кластера
+spec:
+  selector:
+    app: community-service
+  ports:
+    - protocol: TCP
+      port: 8087
+      targetPort: 8087

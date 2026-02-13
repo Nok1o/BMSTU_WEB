@@ -14,7 +14,7 @@ COPY . .
 WORKDIR /app/feedback_service
 
 # Собираем сервис
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o feedback_service ./internal/server.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -o feedback_service ./internal/server.go
 
 # Стейдж финальный
 FROM alpine:latest

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-service-deployment
+  labels:
+    app: file-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: file-service
+  template:
+    metadata:
+      labels:
+        app: file-service
+    spec:
+      containers:
+        - name: file-service
+          image: qf-file-service:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secrets
+            - secretRef:
+                name: minio-credentials
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: file-service # DNS-имя для доступа внутри кластера
+spec:
+  selector:
+    app: file-service
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083

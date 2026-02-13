@@ -4,11 +4,12 @@ import (
     "context"
     "errors"
     "net/http"
+    "quickflow/shared/logger"
 
     "github.com/google/uuid"
     "github.com/gorilla/mux"
 
-    `quickflow/gateway/internal/delivery/http/interfaces`
+    "quickflow/gateway/internal/delivery/http/interfaces"
     errors2 "quickflow/gateway/internal/errors"
     httpUtils "quickflow/gateway/utils/http"
     "quickflow/shared/models"
@@ -31,8 +32,10 @@ func SessionMiddleware(authUseCase interfaces.AuthUseCase) mux.MiddlewareFunc {
                 return
             }
 
+            logger.Info(r.Context(), "going to find user with session=%v", sessionUuid)
             // lookup user by session
             user, err := authUseCase.LookupUserSession(r.Context(), models.Session{SessionId: sessionUuid})
+            logger.Info(r.Context(), "result: %v, err=%v", user, err)
             if err != nil {
                 http.Error(w, "invalid cookie", http.StatusUnauthorized)
                 return

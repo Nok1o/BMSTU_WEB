@@ -14,7 +14,7 @@ COPY . .
 WORKDIR /app/community_service
 
 # Собираем сервис
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o community_service ./internal/server.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -o community_service ./internal/server.go
 
 # Стейдж финальный
 FROM alpine:latest
@@ -26,7 +26,8 @@ RUN apk --no-cache add ca-certificates
 COPY --from=builder /app/community_service/community_service .
 
 COPY --from=builder /app/community_service/deploy/config ./config
+COPY --from=builder /app/community_service/deploy/config /config
 
-EXPOSE 8082
+EXPOSE 8087
 
 ENTRYPOINT ["./community_service"]

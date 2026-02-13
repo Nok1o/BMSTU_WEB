@@ -798,7 +798,7 @@
           "refId": "A"
         }
       ],
-      "title": "main — deploy (8080-8087)",
+      "title": "main — deploy",
       "type": "logs"
     },
     {
@@ -839,7 +839,7 @@
           "refId": "A"
         }
       ],
-      "title": "ro1 — gateway-ro1, user_service-ro1 и др.",
+      "title": "main readonly-1",
       "type": "logs"
     },
     {
@@ -880,7 +880,7 @@
           "refId": "A"
         }
       ],
-      "title": "ro2 — gateway-ro2, user_service-ro2 и др.",
+      "title": "main readonly-2",
       "type": "logs"
     },
     {
@@ -921,7 +921,7 @@
           "refId": "A"
         }
       ],
-      "title": "mirror — gateway-mirror, user_service-mirror и др.",
+      "title": "mirror",
       "type": "logs"
     },
     {
@@ -962,7 +962,7 @@
           "refId": "A"
         }
       ],
-      "title": "mirror-ro1 — gateway-mirror-ro1 и др.",
+      "title": "mirror readonly-1",
       "type": "logs"
     },
     {
@@ -1003,7 +1003,7 @@
           "refId": "A"
         }
       ],
-      "title": "mirror-ro2 — gateway-mirror-ro2 и др.",
+      "title": "mirror readonly-2",
       "type": "logs"
     },
     {
@@ -1016,7 +1016,7 @@
       },
       "id": 101,
       "panels": [],
-      "title": "Infra (оставлено по запросу)",
+      "title": "Infra",
       "type": "row"
     },
     {
@@ -1075,6 +1075,48 @@
         "x": 0,
         "y": 82
       },
+      "id": 110,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "editorMode": "code",
+          "expr": "{container=\"postgres-slave\"} |= \"\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "postgres-slave",
+      "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 90
+      },
       "id": 8,
       "options": {
         "dedupStrategy": "none",
@@ -1100,6 +1142,48 @@
       ],
       "title": "redis",
       "type": "logs"
+    },
+    {
+      "datasource": {
+        "type": "loki",
+        "uid": "P8E80F9AEF21F6940"
+      },
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 98
+      },
+      "id": 109,
+      "options": {
+        "dedupStrategy": "none",
+        "enableLogDetails": true,
+        "prettifyLogMessage": false,
+        "showCommonLabels": false,
+        "showLabels": false,
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "pluginVersion": "11.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "loki",
+            "uid": "P8E80F9AEF21F6940"
+          },
+          "editorMode": "code",
+          "expr": "{container=\"minio\"} |= \"\"",
+          "queryType": "range",
+          "refId": "A"
+        }
+      ],
+      "title": "minio",
+      "type": "logs"
     }
   ],
   "preload": false,
@@ -1121,6 +1205,6 @@
   "timezone": "",
   "title": "Logs: 6 Groups + Infra",
   "uid": "grouped-logs-optimized",
-  "version": 1,
+  "version": 5,
   "weekStart": ""
 }

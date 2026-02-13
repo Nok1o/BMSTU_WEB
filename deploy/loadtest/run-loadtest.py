@@ -19,8 +19,8 @@ NGINX_LOG_PATH = "/opt/homebrew/var/log/nginx/access.log"
 BASE_URL = "http://localhost:8090"
 TEST_ID = f"lt-{int(time.time())}"
 
-CYCLES_GET = 500
-CYCLES_POST = 200
+CYCLES_GET = 2000
+CYCLES_POST = 1000
 
 REPORT_DIR = "./reports"
 os.makedirs(REPORT_DIR, exist_ok=True)
