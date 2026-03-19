@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Общие ресурсы для всех окружений
+resources:
+- ../services/gateway
+- ../services/user-service
+- ../services/post-service
+- ../services/community-service
+- ../services/file-service
+- ../services/friends-service
+- ../services/messenger-service
+- ../services/database
+- ../services/minio
+- ../services/monitoring
+- ../services/balancer
+- secrets.yaml
+- configmap.yaml
+
+## Общие configmaps и secrets
+#configMapGenerator:
+#- name: app-config
+#  literals:
+#  - APP_ENV=development
+#  - LOG_LEVEL=info

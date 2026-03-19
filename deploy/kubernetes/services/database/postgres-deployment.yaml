@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "quickflow_db"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"
+          envFrom:
+            - secretRef:
+                name: postgres-secret
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+            - name: postgres-init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+            - name: postgres-hba-config
+              mountPath: /etc/postgresql/pg_hba.conf
+              subPath: pg_hba.conf
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "quickflow_admin", "-d", "quickflow_db"]
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "quickflow_admin", "-d", "quickflow_db"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+        - name: postgres-init-scripts
+          configMap:
+            name: postgres-config
+            items:
+              - key: init.sql
+                path: init.sql
+        - name: postgres-hba-config
+          configMap:
+            name: postgres-config
+            items:
+              - key: pg_hba.conf
+                path: pg_hba.conf

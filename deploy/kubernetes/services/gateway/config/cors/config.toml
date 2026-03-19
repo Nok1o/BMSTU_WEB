@@ -1,0 +1,8 @@
+allowed_origins = ["https://www.quickflowapp.ru", "http://localhost:3000"]
+allowed_methods = ["GET", "POST", "DELETE", "PUT", "OPTIONS", "PATCH"]
+allowed_headers = ["Cookie", "Content-Type", "X-CSRF-Token"]
+exposed_headers = ["Content-Type", "X-CSRF-Token"]
+allow_credentials = true
+options_passthrough = true
+debug = true
+

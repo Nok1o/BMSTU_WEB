@@ -16,6 +16,8 @@ func getPortFromEnv(envKey string, defaultValue int) int {
 	return defaultValue
 }
 
+var DefaultGatewayServicePort = getPortFromEnv("GATEWAY_SERVICE_PORT", 8080)
+
 // Gateway
 const (
 	DefaultGatewayServiceName = "gateway"

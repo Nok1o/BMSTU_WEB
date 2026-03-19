@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: file-service-deployment
+  labels:
+    app: file-service
+spec:
+  selector:
+    matchLabels:
+      app: file-service
+  template:
+    metadata:
+      labels:
+        app: file-service
+    spec:
+      containers:
+        - name: file-service
+          image: qf-file-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 8081
+            - name: metrics
+              containerPort: 9081
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secrets
+            - secretRef:
+                name: minio-credentials
+          volumeMounts:
+            - name: minio-config-volume
+              mountPath: /deploy/config/minio
+              readOnly: true
+            - name: validation-config-volume
+              mountPath: /deploy/config/validation
+              readOnly: true
+      volumes:
+        - name: minio-config-volume
+          configMap:
+            name: file-service-config
+            items:
+              - key: minio-config
+                path: config.toml
+        - name: validation-config-volume
+          configMap:
+            name: file-service-config
+            items:
+              - key: validation-config
+                path: config.toml
+      restartPolicy: Always

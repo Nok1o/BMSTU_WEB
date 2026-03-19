@@ -9,9 +9,6 @@ import (
 	"net/http"
 	service_discovery "quickflow/utils/service-discovery"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc"
 	addr "quickflow/config/micro-addr"
 	postgresConfig "quickflow/config/postgres"
 	"quickflow/metrics"
@@ -25,6 +22,12 @@ import (
 	"quickflow/shared/interceptors"
 	"quickflow/shared/logger"
 	"quickflow/shared/proto/post_service"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func main() {
@@ -86,6 +89,10 @@ func main() {
 		grpc.MaxSendMsgSize(addr.MaxMessageSize))
 	proto.RegisterPostServiceServer(server, grpc3.NewPostServiceServer(postUseCase, userUseCase))
 	proto.RegisterCommentServiceServer(server, grpc3.NewCommentServiceServer(commentUseCase, userUseCase))
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus(addr.DefaultPostServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
+
 	log.Printf("Server is listening on %s", listener.Addr().String())
 
 	if err = server.Serve(listener); err != nil {

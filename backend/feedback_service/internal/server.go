@@ -9,9 +9,6 @@ import (
 	"net/http"
 	service_discovery "quickflow/utils/service-discovery"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc"
 	addr "quickflow/config/micro-addr"
 	postgresConfig "quickflow/config/postgres"
 	grpc3 "quickflow/feedback_service/internal/delivery/grpc"
@@ -23,6 +20,12 @@ import (
 	"quickflow/shared/interceptors"
 	"quickflow/shared/logger"
 	proto "quickflow/shared/proto/feedback_service"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func main() {
@@ -72,6 +75,9 @@ func main() {
 		grpc.MaxRecvMsgSize(addr.MaxMessageSize),
 		grpc.MaxSendMsgSize(addr.MaxMessageSize))
 	proto.RegisterFeedbackServiceServer(server, grpc3.NewFeedbackServiceServer(feedbackUseCase, profileService))
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus(addr.DefaultFeedbackServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Printf("Server is listening on %s", listener.Addr().String())
 
 	if err = server.Serve(listener); err != nil {

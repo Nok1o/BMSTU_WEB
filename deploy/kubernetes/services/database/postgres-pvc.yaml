@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce # Том может быть смонтирован для чтения/записи одним подом
+  resources:
+    requests:
+      storage: 5Gi # Запрашиваем 5 ГБ дискового пространства. Измените при необходимости.

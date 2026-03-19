@@ -14,6 +14,8 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 
@@ -134,6 +136,9 @@ func main() {
 		grpc.MaxRecvMsgSize(addr.MaxMessageSize),
 		grpc.MaxSendMsgSize(addr.MaxMessageSize))
 	proto.RegisterFileServiceServer(server, grpc2.NewFileServiceServer(fileUseCase))
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus(addr.DefaultFileServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 
 	log.Printf("Server is listening on %s", listener.Addr().String())
 	if err = server.Serve(listener); err != nil {

@@ -1,0 +1,35 @@
+# kubernetes/manifests/smart-balancer-rbac.yaml
+# Файл для ServiceAccount, ClusterRole и ClusterRoleBinding
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: smart-balancer-sa
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole # Это ClusterRole, так как требуются права для всего кластера (endpointslices)
+metadata:
+  name: smart-balancer-reader-role # Даем понятное имя для ClusterRole
+rules:
+  - apiGroups: [""] # Core API group
+    resources:
+      - services # Для чтения сервисов
+      - pods     # Для чтения подов (если будете их напрямую использовать)
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["discovery.k8s.io"] # Для EndpointSlice
+    resources:
+      - endpointslices
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding # ClusterRole привязывается через ClusterRoleBinding
+metadata:
+  name: smart-balancer-reader-binding # Имя для ClusterRoleBinding
+subjects:
+  - kind: ServiceAccount
+    name: smart-balancer-sa      # Имя ServiceAccount из секции выше
+    namespace: default     # Namespace, где ServiceAccount находится
+roleRef:
+  kind: ClusterRole              # <-- Должно быть ClusterRole, как выше
+  name: smart-balancer-reader-role # <-- Имя ClusterRole, ссылку на который мы делаем
+  apiGroup: rbac.authorization.k8s.io

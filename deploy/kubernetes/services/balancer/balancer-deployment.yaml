@@ -1,0 +1,27 @@
+# kubernetes/manifests/smart-balancer.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smart-balancer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smart-balancer
+  template:
+    metadata:
+      labels:
+        app: smart-balancer
+    spec:
+      serviceAccountName: smart-balancer-sa
+      containers:
+        - name: smart-balancer
+          image: smart-balancer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 9000
+          env:
+            - name: TARGET_SERVICE_NAME
+              value: "gateway" # Имя сервиса, который балансируем
+            - name: TARGET_NAMESPACE
+              value: "default" # Namespace, в котором он находится

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: messenger-service-deployment
+  labels:
+    app: messenger-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: messenger-service
+  template:
+    metadata:
+      labels:
+        app: messenger-service
+    spec:
+      containers:
+        - name: messenger-service
+          image: qf-messenger-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8084
+              name: grpc
+            - containerPort: 9084
+              name: metrics
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secrets
+      restartPolicy: Always

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: community-service-deployment
+  labels:
+    app: community-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: community-service
+  template:
+    metadata:
+      labels:
+        app: community-service
+    spec:
+      containers:
+        - name: community-service
+          image: qf-community-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: grpc
+              containerPort: 8087
+            - name: metrics
+              containerPort: 9087
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secrets
+          volumeMounts:
+            - name: community-config-volume
+              mountPath: /deploy/config/community
+              readOnly: true
+      volumes:
+        - name: community-config-volume
+          configMap:
+            name: community-config
+            items:
+              - key: config.toml
+                path: config.toml
+      restartPolicy: Always

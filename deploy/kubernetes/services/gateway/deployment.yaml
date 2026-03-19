@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+  labels:
+    app: gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      volumes:
+        - name: feeder-config-volume
+          configMap:
+            name: gateway-config
+            items:
+              - key: feeder-config
+                path: config.toml
+        - name: cors-config-volume
+          configMap:
+            name: gateway-config
+            items:
+              - key: cors-config
+                path: config.toml
+        - name: minio-config-volume
+          configMap:
+            name: gateway-config
+            items:
+              - key: minio-config
+                path: config.toml
+        - name: validation-config-volume
+          configMap:
+            name: gateway-config
+            items:
+              - key: validation-config
+                path: config.toml
+      containers:
+        - name: gateway
+          image: qf-gateway:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+            - containerPort: 9080
+              name: metrics
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secrets
+          volumeMounts:
+            - name: feeder-config-volume
+              mountPath: /config/feeder
+              readOnly: true
+            - name: cors-config-volume
+              mountPath: /config/cors
+              readOnly: true
+            - name: minio-config-volume
+              mountPath: /config/minio
+              readOnly: true
+            - name: validation-config-volume
+              mountPath: /config/validation
+              readOnly: true
+      restartPolicy: Always

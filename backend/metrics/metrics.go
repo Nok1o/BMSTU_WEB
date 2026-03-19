@@ -8,10 +8,19 @@ type Metrics struct {
 	Hits         *prometheus.CounterVec
 	Timings      *prometheus.HistogramVec
 	ErrorCounter *prometheus.CounterVec
+	InFlight     *prometheus.GaugeVec
 }
 
 func NewMetrics(namespace string) *Metrics {
 	metrics := &Metrics{
+		InFlight: prometheus.NewGaugeVec(
+			prometheus.GaugeOpts{
+				Namespace: namespace,
+				Name:      "InFlightRequests",
+				Help:      "Number of requests currently in flight.",
+			},
+			[]string{"service"}, // Достаточно знать, сколько запросов на сервисе в целом
+		),
 		Hits: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
 				Namespace: namespace,
@@ -40,6 +49,7 @@ func NewMetrics(namespace string) *Metrics {
 	}
 
 	prometheus.MustRegister(
+		metrics.InFlight,
 		metrics.Hits,
 		metrics.Timings,
 		metrics.ErrorCounter,

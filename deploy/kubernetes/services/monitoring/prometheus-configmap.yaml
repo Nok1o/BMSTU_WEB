@@ -1,0 +1,69 @@
+# kubernetes/manifests/monitoring/prometheus-configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring # Размещаем в namespace для мониторинга
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s # Как часто опрашивать цели
+    
+    scrape_configs:
+      # Job для опрашивания подов вашего приложения (каждая реплика отдельно)
+      - job_name: 'quickflow-app'
+        kubernetes_sd_configs:
+          - role: endpoints # Искать endpoints для получения IP каждого пода
+        relabel_configs:
+          # Выбираем только эндпоинты с аннотацией prometheus.io/scrape=true
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          # Используем аннотацию для пути к метрикам
+          - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          # Используем аннотацию для порта метрик
+          - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+            action: replace
+            target_label: __address__
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+          # Добавляем namespace как метку
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: namespace
+          # Добавляем имя сервиса как метку
+          - source_labels: [__meta_kubernetes_service_name]
+            action: replace
+            target_label: service
+          # Добавляем имя пода как метку
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: pod
+          # Добавляем IP пода как метку
+          - source_labels: [__meta_kubernetes_pod_ip]
+            action: replace
+            target_label: pod_ip
+          # Заменяем __address__ на IP:port пода вместо DNS сервиса
+          - source_labels: [__meta_kubernetes_pod_ip, __meta_kubernetes_service_annotation_prometheus_io_port]
+            action: replace
+            target_label: __address__
+            regex: ([^:]+);(\d+)
+            replacement: $1:$2
+
+      # Job для опрашивания самого Prometheus
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      # Job для опрашивания Node Exporter (собирает метрики CPU/RAM с узлов)
+      - job_name: 'node-exporter'
+        kubernetes_sd_configs:
+          - role: endpoints # Искать эндпоинты
+        relabel_configs:
+          # Выбираем только сервисы с меткой app: node-exporter
+          - source_labels: [__meta_kubernetes_service_label_app]
+            action: keep
+            regex: node-exporter

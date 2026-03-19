@@ -11,9 +11,6 @@ import (
 	"path/filepath"
 	service_discovery "quickflow/utils/service-discovery"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc"
 	"quickflow/community_service/config"
 	grpc3 "quickflow/community_service/internal/delivery/grpc"
 	"quickflow/community_service/internal/delivery/grpc/interceptor"
@@ -27,6 +24,12 @@ import (
 	"quickflow/shared/interceptors"
 	"quickflow/shared/logger"
 	proto "quickflow/shared/proto/community_service"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func resolveConfigPath(rel string) string {
@@ -93,6 +96,9 @@ func main() {
 		grpc.MaxSendMsgSize(addr.MaxMessageSize),
 	)
 	proto.RegisterCommunityServiceServer(server, grpc3.NewCommunityServiceServer(communityUseCase))
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus(addr.DefaultCommunityServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
 	log.Printf("Server is listening on %s", listener.Addr().String())
 
 	if err = server.Serve(listener); err != nil {

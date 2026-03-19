@@ -1,15 +1,14 @@
 package internal
 
 import (
+	"context"
 	"fmt"
+	"log"
 	"net/http"
+	"quickflow/shared/logger"
 	service_discovery "quickflow/utils/service-discovery"
 	"strings"
 
-	"github.com/gorilla/mux"
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/microcosm-cc/bluemonday"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"quickflow/config"
 	addr "quickflow/config/micro-addr"
 	qfhttp "quickflow/gateway/internal/delivery/http"
@@ -24,15 +23,41 @@ import (
 	postService "quickflow/shared/client/post_service"
 	userService "quickflow/shared/client/user_service"
 	"quickflow/shared/interceptors"
+
+	"github.com/gorilla/mux"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/microcosm-cc/bluemonday"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc"
 )
 
 func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 	metrics := metrics.NewMetrics("QuickFlow")
 
-	grpcConnPostService, err := service_discovery.NewGRPCClient(
-		addr.DefaultPostServiceName,
-		service_discovery.ModeFailover,
-		interceptors.RequestIDClientInterceptor(),
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		metricsPort := addr.DefaultGatewayServicePort + 1000
+		logger.Info(context.Background(), "Metrics server is running on :%d/metrics", metricsPort)
+		if err := http.ListenAndServe(fmt.Sprintf(":%d", metricsPort), nil); err != nil {
+			log.Fatalf("failed to start metrics HTTP server: %v", err)
+		}
+	}()
+
+	//grpcConnPostService, err := service_discovery.NewGRPCClient(
+	//	addr.DefaultPostServiceName,
+	//	service_discovery.ModeFailover,
+	//	interceptors.RequestIDClientInterceptor(),
+	//)
+	grpcConnPostService, err := grpc.Dial(
+		"smart-balancer-service:9000",
+		grpc.WithInsecure(),
+		grpc.WithChainUnaryInterceptor(
+			interceptors.RequestIDClientInterceptor(),
+			interceptors.DestinationUnaryInterceptor(addr.DefaultPostServiceName),
+		),
+		grpc.WithChainStreamInterceptor(
+			interceptors.DestinationStreamInterceptor(addr.DefaultPostServiceName),
+		),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to post service: %w", err)
@@ -124,6 +149,7 @@ func BuildHandler(cfg *config.Config) (*mux.Router, error) {
 	r.Use(middleware.RecoveryMiddleware)
 	r.Use(middleware.MetricsMiddleware(metrics))
 	r.Use(middleware.ReadOnlyMiddleware)
+	r.Use(middleware.MetricsMiddleware(metrics))
 	r.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	})

@@ -10,9 +10,6 @@ import (
 	redis2 "quickflow/config/redis"
 	service_discovery "quickflow/utils/service-discovery"
 
-	_ "github.com/jackc/pgx/v5/stdlib"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"google.golang.org/grpc"
 	addr "quickflow/config/micro-addr"
 	postgresConfig "quickflow/config/postgres"
 	"quickflow/metrics"
@@ -25,6 +22,12 @@ import (
 	"quickflow/user_service/internal/repository/postgres"
 	"quickflow/user_service/internal/repository/redis"
 	"quickflow/user_service/internal/usecase"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 )
 
 func main() {
@@ -79,6 +82,10 @@ func main() {
 		grpc.MaxSendMsgSize(addr.MaxMessageSize))
 	proto.RegisterUserServiceServer(server, grpc2.NewUserServiceServer(userUserCase))
 	proto.RegisterProfileServiceServer(server, grpc2.NewProfileServiceServer(profileUseCase))
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus(addr.DefaultUserServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
+
 	log.Printf("Server is listening on %s", listener.Addr().String())
 
 	if err = server.Serve(listener); err != nil {

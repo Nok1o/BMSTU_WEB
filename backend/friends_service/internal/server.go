@@ -11,6 +11,8 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
 
 	addr "quickflow/config/micro-addr"
 	postgresConfig "quickflow/config/postgres"
@@ -59,9 +61,12 @@ func main() {
 		grpc.MaxRecvMsgSize(addr.MaxMessageSize),
 		grpc.MaxSendMsgSize(addr.MaxMessageSize),
 	)
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus(addr.DefaultFriendsServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
+	proto.RegisterFriendsServiceServer(server, grpc3.NewFriendsServiceServer(friendsUseCase))
 
 	log.Printf("Server is listening on %s", listener.Addr().String())
-	proto.RegisterFriendsServiceServer(server, grpc3.NewFriendsServiceServer(friendsUseCase))
 	if err = server.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

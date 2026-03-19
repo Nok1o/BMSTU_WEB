@@ -12,6 +12,9 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health"
+	"google.golang.org/grpc/health/grpc_health_v1"
+
 	addr "quickflow/config/micro-addr"
 	postgresConfig "quickflow/config/postgres"
 	grpc2 "quickflow/messenger_service/internal/delivery/grpc"
@@ -101,6 +104,10 @@ func main() {
 	proto.RegisterChatServiceServer(server, grpc2.NewChatServiceServer(chatUseCase))
 	proto.RegisterMessageServiceServer(server, grpc2.NewMessageServiceServer(messageUseCase))
 	proto.RegisterStickerServiceServer(server, grpc2.NewStickerServiceServer(stickerUseCase))
+	healthServer := health.NewServer()
+	grpc_health_v1.RegisterHealthServer(server, healthServer)
+	healthServer.SetServingStatus(addr.DefaultMessengerServiceName, grpc_health_v1.HealthCheckResponse_SERVING)
+
 	if err = server.Serve(listener); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}

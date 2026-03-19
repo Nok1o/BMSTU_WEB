@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Базовые ресурсы
+resources:
+- ../../base
+- namespace.yaml
+
+# Специфичные для staging настройки
+namespace: quickflow-staging
+
+# Генерация configmap для staging
+configMapGenerator:
+- name: staging-config
+  literals:
+  - ENV=staging
+  - DEBUG=false

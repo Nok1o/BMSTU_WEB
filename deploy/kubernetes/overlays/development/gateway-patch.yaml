@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-deployment
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+        - name: gateway
+          env:
+            - name: LOG_LEVEL
+              value: debug

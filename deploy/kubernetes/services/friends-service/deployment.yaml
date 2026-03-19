@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: friends-service-deployment
+  labels:
+    app: friends-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: friends-service
+  template:
+    metadata:
+      labels:
+        app: friends-service
+    spec:
+      containers:
+        - name: friends-service
+          image: qf-friends-service:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8086
+              name: grpc
+            - containerPort: 9086
+              name: metrics
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secrets
+      restartPolicy: Always

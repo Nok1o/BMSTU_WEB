@@ -1,0 +1,18 @@
+
+server_port: 9000
+balancer_type: smart-balancer
+
+kubernetes:
+  service_discovery_namespace: default
+
+latency:
+  health_endpoint: /api/v2/health
+
+smart_balancer:
+  weight_latency: 0.4
+  weight_cpu: 0.3
+  weight_memory: 0.1
+  weight_in_flight: 0.2
+
+logger:
+  level: debug
