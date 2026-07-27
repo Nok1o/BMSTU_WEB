@@ -96,7 +96,7 @@ func (c *PostgresCommentRepository) GetCommentLikes(ctx context.Context, comment
 		return nil, post_errors.ErrNotFound
 	}
 	if err != nil {
-		logger.Error(ctx, "Unable to get comments from database for post %v, numComments %v, timestamp %v: %s", commentId, numLikes, err.Error())
+		logger.Error(ctx, "Unable to get likes from database for comment %v, numLikes %v, offset %v: %s", commentId, numLikes, offset, err.Error())
 		return nil, fmt.Errorf("unable to get comments from database: %w", err)
 	}
 	defer rows.Close()
