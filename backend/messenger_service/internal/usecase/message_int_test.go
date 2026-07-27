@@ -16,6 +16,7 @@ import (
 	userclient "quickflow/shared/client/user_service"
 	"quickflow/shared/interceptors"
 	getEnv "quickflow/utils/get-env"
+	service_discovery "quickflow/utils/service-discovery"
 	"testing"
 	"time"
 
@@ -67,6 +68,7 @@ func (s *MessageServiceTestSuite) BeforeAll(t provider.T) {
 		// Setup gRPC connections
 		grpcConnFileService, err := service_discovery.NewGRPCClient(
 			addr.DefaultFileServiceName,
+			service_discovery.ModeFailover,
 			interceptors.RequestIDClientInterceptor(),
 		)
 		if err != nil {
@@ -76,6 +78,7 @@ func (s *MessageServiceTestSuite) BeforeAll(t provider.T) {
 
 		grpcConnUserService, err := service_discovery.NewGRPCClient(
 			addr.DefaultUserServiceName,
+			service_discovery.ModeFailover,
 			interceptors.RequestIDClientInterceptor(),
 		)
 		if err != nil {

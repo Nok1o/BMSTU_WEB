@@ -612,7 +612,7 @@ func (p *PostHandler) GetPostLikes(w http.ResponseWriter, r *http.Request) {
 		offset = 0 // значение по умолчанию
 	}
 
-	logger.Info(ctx, "User requested likes for post %s, timestamp: %s, num_likes: %d, offset: %d", postId.String(), numLikes, offset)
+	logger.Info(ctx, "User requested likes for post %s, num_likes: %d, offset: %d", postId.String(), numLikes, offset)
 
 	likes, err := p.postUseCase.GetPostLikes(ctx, postId, numLikes, offset)
 	if err != nil {

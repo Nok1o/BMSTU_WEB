@@ -446,7 +446,7 @@ func (p *CommentHandler) GetCommentLikes(w http.ResponseWriter, r *http.Request)
 		offset = 0 // значение по умолчанию
 	}
 
-	logger.Info(ctx, "User requested likes for post %s, timestamp: %s, num_likes: %d, offset: %d", commentId.String(), numLikes, offset)
+	logger.Info(ctx, "User requested likes for comment %s, num_likes: %d, offset: %d", commentId.String(), numLikes, offset)
 
 	likes, err := p.commentUseCase.GetCommentLikes(ctx, commentId, numLikes, offset)
 	if err != nil {

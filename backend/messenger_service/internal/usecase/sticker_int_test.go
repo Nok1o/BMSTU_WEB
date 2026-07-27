@@ -15,6 +15,7 @@ import (
 	"quickflow/shared/client/file_service"
 	"quickflow/shared/interceptors"
 	getEnv "quickflow/utils/get-env"
+	service_discovery "quickflow/utils/service-discovery"
 	"testing"
 
 	"github.com/google/uuid"
@@ -62,6 +63,7 @@ func (s *StickerServiceTestSuite) BeforeAll(t provider.T) {
 		// Setup gRPC connection for file service
 		grpcConnFileService, err := service_discovery.NewGRPCClient(
 			addr.DefaultFileServiceName,
+			service_discovery.ModeFailover,
 			interceptors.RequestIDClientInterceptor(),
 		)
 		if err != nil {

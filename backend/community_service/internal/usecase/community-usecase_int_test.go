@@ -16,11 +16,13 @@ import (
 	"quickflow/community_service/config"
 	"quickflow/community_service/internal/repository/postgres"
 	"quickflow/community_service/utils/validation"
+	addr "quickflow/config/micro-addr"
 	"quickflow/config/test"
 	fileService "quickflow/shared/client/file_service"
 	"quickflow/shared/interceptors"
 	"quickflow/shared/models"
 	getEnv "quickflow/utils/get-env"
+	service_discovery "quickflow/utils/service-discovery"
 	"testing"
 	"time"
 

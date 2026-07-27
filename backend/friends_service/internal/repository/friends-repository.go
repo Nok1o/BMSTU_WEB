@@ -109,7 +109,7 @@ func (p *PostgresFriendsRepository) GetFriendsPublicInfo(ctx context.Context, us
 	var isRead = true
 	switch reqType {
 
-	case "friend":
+	case "all", "friend":
 		rel1 = models.RelationFriend
 		rel2 = models.RelationFriend
 
