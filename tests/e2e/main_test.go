@@ -5,17 +5,16 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"io"
 	"mime/multipart"
 	"net"
 	"net/http"
-	"net/http/cookiejar"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 	"github.com/ozontech/allure-go/pkg/framework/provider"
 	"github.com/ozontech/allure-go/pkg/framework/suite"
 	"github.com/stretchr/testify/assert"
@@ -106,6 +105,11 @@ type AuthResponse struct {
 	Message string `json:"message"`
 }
 
+type SignUpResponse struct {
+	ID        string `json:"id"`
+	SessionID string `json:"session_id"`
+}
+
 type PostResponse struct {
 	Payload struct {
 		ID string `json:"id"`
@@ -184,9 +188,7 @@ func (s *E2ETestSuite) BeforeAll(t provider.T) {
 
 	t.WithNewStep("Setup test suite", func(ctx provider.StepCtx) {
 		s.baseURL = "http://gateway:8080/api/v1"
-		jar, _ := cookiejar.New(nil)
 		s.client = &http.Client{
-			Jar:     jar,
 			Timeout: 30 * time.Second,
 		}
 
@@ -214,7 +216,7 @@ func (s *E2ETestSuite) TestFullUserJourney(t provider.T) {
 	t.Description("Complete end-to-end test covering user registration, authentication, profile management, content creation, social interactions, and real-time messaging")
 
 	t.WithNewStep("=== Starting Full E2E User Journey Test ===", func(ctx provider.StepCtx) {
-		// 1. Регистрация и получение user_id через поиск
+		// 1. Регистрация и получение user_id из ответа API
 		s.registerAndGetUserIDs(t)
 
 		// 2. Логин (для получения новых сессий)
@@ -267,14 +269,13 @@ func (s *E2ETestSuite) registerAndGetUserIDs(t provider.T) {
 		}
 
 		resp1 := s.makeRequest("POST", "/signup", signUpData1, nil, false, false)
-		assert.Equal(t, http.StatusOK, resp1.StatusCode)
+		s.requireStatus(t, resp1, http.StatusCreated)
 
 		s.testUser1.Session = s.getSessionCookie(resp1)
-
-		// Получение user_id первого пользователя через поиск
-		userID1 := s.getUserIDByUsername(s.testUser1.Username, s.testUser1.Session)
-		assert.NotEmpty(t, userID1, "Should get user ID for first user")
-		s.testUser1.UserID = userID1
+		var signUpResp1 SignUpResponse
+		s.parseResponse(resp1, &signUpResp1)
+		s.testUser1.UserID = signUpResp1.ID
+		t.Require().NotEmpty(s.testUser1.UserID, "Signup should return first user ID")
 
 		// Регистрация второго пользователя
 		signUpData2 := SignUpForm{
@@ -287,53 +288,16 @@ func (s *E2ETestSuite) registerAndGetUserIDs(t provider.T) {
 		}
 
 		resp2 := s.makeRequest("POST", "/signup", signUpData2, nil, false, false)
-		assert.Equal(t, http.StatusOK, resp2.StatusCode)
+		s.requireStatus(t, resp2, http.StatusCreated)
 
 		s.testUser2.Session = s.getSessionCookie(resp2)
-
-		// Получение user_id второго пользователя через поиск
-		userID2 := s.getUserIDByUsername(s.testUser2.Username, s.testUser2.Session)
-		assert.NotEmpty(t, userID2, "Should get user ID for second user")
-		s.testUser2.UserID = userID2
+		var signUpResp2 SignUpResponse
+		s.parseResponse(resp2, &signUpResp2)
+		s.testUser2.UserID = signUpResp2.ID
+		t.Require().NotEmpty(s.testUser2.UserID, "Signup should return second user ID")
 
 		t.Logf("User1 ID: %s, User2 ID: %s", s.testUser1.UserID, s.testUser2.UserID)
 	})
-}
-
-func (s *E2ETestSuite) getUserIDByUsername(username, session string) string {
-	// Создаем временный клиент с переданной сессией
-	jar, _ := cookiejar.New(nil)
-	tempClient := &http.Client{
-		Jar:     jar,
-		Timeout: 10 * time.Second,
-	}
-
-	req, _ := http.NewRequest("GET",
-		fmt.Sprintf("%s/users/search?to_search=%s&count=1", s.baseURL, username),
-		nil)
-
-	// Устанавливаем куку сессии
-	req.Header.Set("Cookie", session)
-
-	resp, err := tempClient.Do(req)
-	if err != nil {
-		return ""
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return ""
-	}
-
-	var searchResp SearchUsersResponse
-	body, _ := io.ReadAll(resp.Body)
-	json.Unmarshal(body, &searchResp)
-
-	if len(searchResp.Users) > 0 {
-		return searchResp.Users[0].ID
-	}
-
-	return ""
 }
 
 func (s *E2ETestSuite) loginUsers(t provider.T) {
@@ -345,7 +309,7 @@ func (s *E2ETestSuite) loginUsers(t provider.T) {
 		}
 
 		resp1 := s.makeRequest("POST", "/login", loginData1, nil, false, false)
-		assert.Equal(t, http.StatusOK, resp1.StatusCode)
+		s.requireStatus(t, resp1, http.StatusCreated)
 		s.testUser1.Session = s.getSessionCookie(resp1)
 
 		// Логин второго пользователя для получения новой сессии
@@ -355,7 +319,7 @@ func (s *E2ETestSuite) loginUsers(t provider.T) {
 		}
 
 		resp2 := s.makeRequest("POST", "/login", loginData2, nil, false, false)
-		assert.Equal(t, http.StatusOK, resp2.StatusCode)
+		s.requireStatus(t, resp2, http.StatusCreated)
 		s.testUser2.Session = s.getSessionCookie(resp2)
 
 		ctx.Log("Both users successfully logged in")
@@ -368,7 +332,7 @@ func (s *E2ETestSuite) getCSRFTokens(t provider.T) {
 		req1, _ := http.NewRequest("GET", s.baseURL+"/csrf", nil)
 		req1.Header.Set("Cookie", s.testUser1.Session)
 		resp1, _ := s.client.Do(req1)
-		assert.Equal(t, http.StatusOK, resp1.StatusCode)
+		s.requireStatus(t, resp1, http.StatusOK)
 
 		csrfTokenHeader := resp1.Header.Get("X-CSRF-Token")
 		s.testUser1.CSRFToken = csrfTokenHeader
@@ -377,7 +341,7 @@ func (s *E2ETestSuite) getCSRFTokens(t provider.T) {
 		req2, _ := http.NewRequest("GET", s.baseURL+"/csrf", nil)
 		req2.Header.Set("Cookie", s.testUser2.Session)
 		resp2, _ := s.client.Do(req2)
-		assert.Equal(t, http.StatusOK, resp2.StatusCode)
+		s.requireStatus(t, resp2, http.StatusOK)
 
 		csrfTokenHeader = resp2.Header.Get("X-CSRF-Token")
 		s.testUser2.CSRFToken = csrfTokenHeader
@@ -398,7 +362,7 @@ func (s *E2ETestSuite) updateProfiles(t provider.T) {
 		}
 
 		resp1 := s.makeRequest("POST", "/profile", profileData1, s.testUser1, true, true)
-		assert.Equal(t, http.StatusOK, resp1.StatusCode)
+		s.requireStatus(t, resp1, http.StatusOK)
 
 		// Обновление профиля второго пользователя
 		profileData2 := map[string]interface{}{
@@ -410,7 +374,7 @@ func (s *E2ETestSuite) updateProfiles(t provider.T) {
 		}
 
 		resp2 := s.makeRequest("POST", "/profile", profileData2, s.testUser2, true, true)
-		assert.Equal(t, http.StatusOK, resp2.StatusCode)
+		s.requireStatus(t, resp2, http.StatusOK)
 
 		ctx.Log("User profiles updated successfully")
 	})
@@ -427,7 +391,7 @@ func (s *E2ETestSuite) createPosts(t provider.T) {
 		}
 
 		resp1 := s.makeRequest("POST", "/post", postData1, s.testUser1, true, false)
-		assert.Equal(t, http.StatusOK, resp1.StatusCode)
+		s.requireStatus(t, resp1, http.StatusOK)
 
 		var postResp1 PostResponse
 		s.parseResponse(resp1, &postResp1)
@@ -444,7 +408,7 @@ func (s *E2ETestSuite) createPosts(t provider.T) {
 		}
 
 		resp2 := s.makeRequest("POST", "/post", postData2, s.testUser2, true, false)
-		assert.Equal(t, http.StatusOK, resp2.StatusCode)
+		s.requireStatus(t, resp2, http.StatusOK)
 
 		ctx.Log("Posts created successfully by both users")
 	})
@@ -459,7 +423,7 @@ func (s *E2ETestSuite) createComments(t provider.T) {
 
 		resp := s.makeRequest("POST", fmt.Sprintf("/posts/%s/comment", s.postID),
 			commentData, s.testUser2, true, false)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		s.requireStatus(t, resp, http.StatusOK)
 
 		var commentResp CommentResponse
 		s.parseResponse(resp, &commentResp)
@@ -474,12 +438,12 @@ func (s *E2ETestSuite) likeContent(t provider.T) {
 		// Лайк поста первым пользователем (своему посту)
 		resp1 := s.makeRequest("POST", fmt.Sprintf("/posts/%s/like", s.postID),
 			nil, s.testUser1, true, false)
-		assert.Equal(t, http.StatusCreated, resp1.StatusCode)
+		s.requireStatus(t, resp1, http.StatusCreated)
 
 		// Лайк комментария вторым пользователем (своему комментарию)
 		resp2 := s.makeRequest("POST", fmt.Sprintf("/comments/%s/like", s.commentID),
 			nil, s.testUser2, true, false)
-		assert.Equal(t, http.StatusCreated, resp2.StatusCode)
+		s.requireStatus(t, resp2, http.StatusCreated)
 
 		ctx.Log("Content liked successfully")
 	})
@@ -494,7 +458,7 @@ func (s *E2ETestSuite) createCommunity(t provider.T) {
 		}
 
 		resp := s.makeRequest("POST", "/community", communityData, s.testUser1, true, true)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		s.requireStatus(t, resp, http.StatusOK)
 
 		var communityResp CommunityResponse
 		s.parseResponse(resp, &communityResp)
@@ -510,12 +474,12 @@ func (s *E2ETestSuite) searchAndAddFriends(t provider.T) {
 		searchResp := s.makeRequest("GET",
 			fmt.Sprintf("/users/search?to_search=%s&count=1", s.testUser2.Username),
 			nil, s.testUser1, false, false)
-		assert.Equal(t, http.StatusOK, searchResp.StatusCode)
+		s.requireStatus(t, searchResp, http.StatusOK)
 
 		var searchResult SearchUsersResponse
 		s.parseResponse(searchResp, &searchResult)
 
-		assert.Greater(t, len(searchResult.Users), 0, "Should find user in search")
+		t.Require().Greater(len(searchResult.Users), 0, "Should find user in search")
 		assert.Equal(t, s.testUser2.UserID, searchResult.Users[0].ID, "Found user ID should match")
 
 		// Отправка запроса в друзья
@@ -524,7 +488,7 @@ func (s *E2ETestSuite) searchAndAddFriends(t provider.T) {
 		}
 
 		resp2 := s.makeRequest("POST", "/follow", friendData, s.testUser1, true, false)
-		assert.Equal(t, http.StatusOK, resp2.StatusCode)
+		s.requireStatus(t, resp2, http.StatusOK)
 
 		ctx.Log("Friend request sent successfully")
 	})
@@ -703,7 +667,7 @@ func (s *E2ETestSuite) checkFeed(t provider.T) {
 	t.WithNewStep("11. Checking feed", func(ctx provider.StepCtx) {
 		// Получение ленты первого пользователя
 		resp := s.makeRequest("GET", "/feed?count=100", nil, s.testUser1, false, false)
-		assert.Equal(t, http.StatusOK, resp.StatusCode)
+		s.requireStatus(t, resp, http.StatusOK)
 
 		var feedResp []PostOut
 		s.parseResponse(resp, &feedResp)
@@ -730,7 +694,7 @@ func (s *E2ETestSuite) getProfiles(t provider.T) {
 	t.WithNewStep("12. Getting profiles", func(ctx provider.StepCtx) {
 		// Получение собственного профиля первого пользователя
 		myProfileResp := s.makeRequest("GET", "/my_profile", nil, s.testUser1, false, false)
-		assert.Equal(t, http.StatusOK, myProfileResp.StatusCode)
+		s.requireStatus(t, myProfileResp, http.StatusOK)
 
 		var myProfile ProfileResponse
 		s.parseResponse(myProfileResp, &myProfile)
@@ -740,7 +704,7 @@ func (s *E2ETestSuite) getProfiles(t provider.T) {
 		userProfileResp := s.makeRequest("GET",
 			fmt.Sprintf("/profiles/%s", s.testUser2.Username),
 			nil, s.testUser1, false, false)
-		assert.Equal(t, http.StatusOK, userProfileResp.StatusCode)
+		s.requireStatus(t, userProfileResp, http.StatusOK)
 
 		ctx.Log("Profiles retrieved successfully")
 	})
@@ -825,6 +789,12 @@ func (s *E2ETestSuite) makeRequest(method, endpoint string, data interface{}, us
 	}
 
 	return resp
+}
+
+func (s *E2ETestSuite) requireStatus(t provider.T, resp *http.Response, expected int) {
+	t.Helper()
+	t.Require().NotNil(resp, "request should return an HTTP response")
+	t.Require().Equal(expected, resp.StatusCode)
 }
 
 func (s *E2ETestSuite) parseResponse(resp *http.Response, target interface{}) {

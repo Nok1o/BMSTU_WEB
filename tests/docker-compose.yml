@@ -10,19 +10,19 @@ services:
       - ../deploy/config:/config
     depends_on:
       post_service:
-        condition: service_started
+        condition: service_healthy
       user_service:
-        condition: service_started
+        condition: service_healthy
       file_service:
-        condition: service_started
+        condition: service_healthy
       messenger_service:
-        condition: service_started
+        condition: service_healthy
       community_service:
-        condition: service_started
+        condition: service_healthy
       feedback_service:
-        condition: service_started
+        condition: service_healthy
       friends_service:
-        condition: service_started
+        condition: service_healthy
       minio:
         condition: service_healthy
       redis:
@@ -37,7 +37,7 @@ services:
     networks:
       - integration-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/hello || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/v1/hello || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -66,6 +66,11 @@ services:
       - .env
     networks:
       - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8081"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   post_service:
     build:
@@ -89,6 +94,11 @@ services:
       - .env
     networks:
       - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8082"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   user_service:
     build:
@@ -110,6 +120,11 @@ services:
       - .env
     networks:
       - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8083"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   messenger_service:
     build:
@@ -133,6 +148,11 @@ services:
       - .env
     networks:
       - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8084"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   feedback_service:
     build:
@@ -156,6 +176,11 @@ services:
       - .env
     networks:
       - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8085"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   friends_service:
     build:
@@ -177,6 +202,11 @@ services:
       - .env
     networks:
       - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8086"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   community_service:
     build:
@@ -200,6 +230,11 @@ services:
       - .env
     networks:
       - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 8087"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
 
   postgres:
     image: postgres:15
@@ -312,7 +347,7 @@ services:
     container_name: e2e-test
     depends_on:
       gateway:
-        condition: service_started
+        condition: service_healthy
     networks:
       - integration-network
     volumes:
