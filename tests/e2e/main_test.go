@@ -117,7 +117,9 @@ type CommentResponse struct {
 }
 
 type CommunityResponse struct {
-	ID string `json:"id"`
+	Payload struct {
+		ID string `json:"id"`
+	} `json:"payload"`
 }
 
 type ProfileResponse struct {
@@ -181,7 +183,7 @@ func (s *E2ETestSuite) BeforeAll(t provider.T) {
 	t.Description("Setup test environment and initialize test users")
 
 	t.WithNewStep("Setup test suite", func(ctx provider.StepCtx) {
-		s.baseURL = "http://gateway:8080"
+		s.baseURL = "http://gateway:8080/api/v1"
 		jar, _ := cookiejar.New(nil)
 		s.client = &http.Client{
 			Jar:     jar,
@@ -307,7 +309,7 @@ func (s *E2ETestSuite) getUserIDByUsername(username, session string) string {
 	}
 
 	req, _ := http.NewRequest("GET",
-		fmt.Sprintf("%s/users/search?string=%s&count=1", s.baseURL, username),
+		fmt.Sprintf("%s/users/search?to_search=%s&count=1", s.baseURL, username),
 		nil)
 
 	// Устанавливаем куку сессии
@@ -388,13 +390,11 @@ func (s *E2ETestSuite) updateProfiles(t provider.T) {
 	t.WithNewStep("4. Updating user profiles", func(ctx provider.StepCtx) {
 		// Обновление профиля первого пользователя
 		profileData1 := map[string]interface{}{
-			"profile": map[string]interface{}{
-				"firstname":  "OtherFirstName",
-				"lastname":   "OtherLastName",
-				"sex":        0,
-				"birth_date": "1990-01-01",
-				"bio":        "Test bio for user 1",
-			},
+			"firstname":  "OtherFirstName",
+			"lastname":   "OtherLastName",
+			"sex":        0,
+			"birth_date": "1990-01-01",
+			"bio":        "Test bio for user 1",
 		}
 
 		resp1 := s.makeRequest("POST", "/profile", profileData1, s.testUser1, true, true)
@@ -402,13 +402,11 @@ func (s *E2ETestSuite) updateProfiles(t provider.T) {
 
 		// Обновление профиля второго пользователя
 		profileData2 := map[string]interface{}{
-			"profile": map[string]interface{}{
-				"firstname":  "OtherFirstName",
-				"lastname":   "OtherLastName",
-				"sex":        1,
-				"birth_date": "1990-02-02",
-				"bio":        "Test bio for user 2",
-			},
+			"firstname":  "OtherFirstName",
+			"lastname":   "OtherLastName",
+			"sex":        1,
+			"birth_date": "1990-02-02",
+			"bio":        "Test bio for user 2",
 		}
 
 		resp2 := s.makeRequest("POST", "/profile", profileData2, s.testUser2, true, true)
@@ -476,12 +474,12 @@ func (s *E2ETestSuite) likeContent(t provider.T) {
 		// Лайк поста первым пользователем (своему посту)
 		resp1 := s.makeRequest("POST", fmt.Sprintf("/posts/%s/like", s.postID),
 			nil, s.testUser1, true, false)
-		assert.Equal(t, http.StatusOK, resp1.StatusCode)
+		assert.Equal(t, http.StatusCreated, resp1.StatusCode)
 
 		// Лайк комментария вторым пользователем (своему комментарию)
 		resp2 := s.makeRequest("POST", fmt.Sprintf("/comments/%s/like", s.commentID),
 			nil, s.testUser2, true, false)
-		assert.Equal(t, http.StatusOK, resp2.StatusCode)
+		assert.Equal(t, http.StatusCreated, resp2.StatusCode)
 
 		ctx.Log("Content liked successfully")
 	})
@@ -500,7 +498,7 @@ func (s *E2ETestSuite) createCommunity(t provider.T) {
 
 		var communityResp CommunityResponse
 		s.parseResponse(resp, &communityResp)
-		s.communityID = communityResp.ID
+		s.communityID = communityResp.Payload.ID
 
 		t.Logf("Created community with ID: %s", s.communityID)
 	})
@@ -510,7 +508,7 @@ func (s *E2ETestSuite) searchAndAddFriends(t provider.T) {
 	t.WithNewStep("9. Searching and adding friends", func(ctx provider.StepCtx) {
 		// Поиск второго пользователя первым пользователем
 		searchResp := s.makeRequest("GET",
-			fmt.Sprintf("/users/search?string=%s&count=1", s.testUser2.Username),
+			fmt.Sprintf("/users/search?to_search=%s&count=1", s.testUser2.Username),
 			nil, s.testUser1, false, false)
 		assert.Equal(t, http.StatusOK, searchResp.StatusCode)
 
@@ -704,7 +702,7 @@ func (s *E2ETestSuite) receiveWebSocketMessages(conn *websocket.Conn, timeout ti
 func (s *E2ETestSuite) checkFeed(t provider.T) {
 	t.WithNewStep("11. Checking feed", func(ctx provider.StepCtx) {
 		// Получение ленты первого пользователя
-		resp := s.makeRequest("GET", "/feed?posts_count=100", nil, s.testUser1, false, false)
+		resp := s.makeRequest("GET", "/feed?count=100", nil, s.testUser1, false, false)
 		assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 		var feedResp []PostOut
