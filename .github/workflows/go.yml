@@ -232,6 +232,10 @@ jobs:
       - name: Run e2e tests
         run: docker compose -f tests/docker-compose.yml up --exit-code-from e2e-test e2e-test
 
+      - name: Show service logs on failure
+        if: failure()
+        run: docker compose -f tests/docker-compose.yml logs --no-color gateway post_service smart-balancer-service
+
       - name: Shut down
         if: always()
         run: docker compose -f tests/docker-compose.yml down -v

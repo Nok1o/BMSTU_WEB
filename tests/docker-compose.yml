@@ -11,6 +11,8 @@ services:
     depends_on:
       post_service:
         condition: service_healthy
+      smart-balancer-service:
+        condition: service_healthy
       user_service:
         condition: service_healthy
       file_service:
@@ -100,6 +102,22 @@ services:
           - post-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8082"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  smart-balancer-service:
+    build:
+      context: ../
+      dockerfile: tests/docker/smart-balancer.Dockerfile
+    container_name: smart-balancer-service
+    depends_on:
+      post_service:
+        condition: service_healthy
+    networks:
+      - integration-network
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9000"]
       interval: 5s
       timeout: 3s
       retries: 12

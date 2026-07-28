@@ -794,6 +794,12 @@ func (s *E2ETestSuite) makeRequest(method, endpoint string, data interface{}, us
 func (s *E2ETestSuite) requireStatus(t provider.T, resp *http.Response, expected int) {
 	t.Helper()
 	t.Require().NotNil(resp, "request should return an HTTP response")
+	if resp.StatusCode != expected {
+		body, _ := io.ReadAll(resp.Body)
+		_ = resp.Body.Close()
+		t.Require().Equal(expected, resp.StatusCode, "response body: %s", strings.TrimSpace(string(body)))
+		return
+	}
 	t.Require().Equal(expected, resp.StatusCode)
 }
 
