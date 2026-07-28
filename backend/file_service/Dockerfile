@@ -1,6 +1,8 @@
 # Стейдж сборки
 FROM golang:1.24 AS builder
 
+ARG TARGETARCH
+
 WORKDIR /app
 
 # Копируем go.mod и go.sum
@@ -21,12 +23,15 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} go build -o file_service ./int
 # Стейдж финальный
 FROM debian:bookworm-slim
 
+ARG TARGETARCH
+
 WORKDIR /root/
 
 RUN apt-get update && apt-get install -y \
     curl \
     bash \
-    && curl -sLf https://dl.min.io/client/mc/release/linux-arm64/mc -o /usr/local/bin/mc \
+    netcat-openbsd \
+    && curl -sLf "https://dl.min.io/client/mc/release/linux-${TARGETARCH}/mc" -o /usr/local/bin/mc \
     && chmod +x /usr/local/bin/mc \
     && apt-get clean
 
