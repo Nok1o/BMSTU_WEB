@@ -214,8 +214,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      #      - name: Set up Docker Compose
-      #        run: docker compose -f tests/docker-compose.yml build
+      - name: Build Docker Compose services
+        run: docker compose -f tests/docker-compose.yml build
 
       - name: Start dependencies
         run: docker compose -f tests/docker-compose.yml up -d postgres redis minio

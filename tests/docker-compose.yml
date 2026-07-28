@@ -65,7 +65,9 @@ services:
     env_file:
       - .env
     networks:
-      - integration-network
+      integration-network:
+        aliases:
+          - file-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8081"]
       interval: 5s
@@ -93,7 +95,9 @@ services:
     env_file:
       - .env
     networks:
-      - integration-network
+      integration-network:
+        aliases:
+          - post-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8082"]
       interval: 5s
@@ -119,7 +123,9 @@ services:
     env_file:
       - .env
     networks:
-      - integration-network
+      integration-network:
+        aliases:
+          - user-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8083"]
       interval: 5s
@@ -147,7 +153,9 @@ services:
     env_file:
       - .env
     networks:
-      - integration-network
+      integration-network:
+        aliases:
+          - messenger-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8084"]
       interval: 5s
@@ -175,7 +183,9 @@ services:
     env_file:
       - .env
     networks:
-      - integration-network
+      integration-network:
+        aliases:
+          - feedback-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8085"]
       interval: 5s
@@ -201,7 +211,9 @@ services:
     env_file:
       - .env
     networks:
-      - integration-network
+      integration-network:
+        aliases:
+          - friends-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8086"]
       interval: 5s
@@ -229,7 +241,9 @@ services:
     env_file:
       - .env
     networks:
-      - integration-network
+      integration-network:
+        aliases:
+          - community-service
     healthcheck:
       test: ["CMD-SHELL", "nc -z localhost 8087"]
       interval: 5s
